@@ -21,6 +21,7 @@ namespace PurgeDemoCommands
 
         public IList<string> Filenames { get; set; }
         public string Suffix { get; set; }
+        public bool SkipTest { get; set; }
 
         public void Execute()
         {
@@ -62,7 +63,11 @@ namespace PurgeDemoCommands
                 string tempFilename = tempFileCollection.AddExtension("dem");
                 File.Copy(filename, tempFilename);
 
+
                 ReplaceCommandsIn(demo, tempFilename);
+                if (!SkipTest)
+                    EnsureDemoIsReadable(tempFilename);
+
 
                 string newFilename = Path.GetFileNameWithoutExtension(filename) + Suffix + Path.GetExtension(filename);
                 string newFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
@@ -136,6 +141,20 @@ namespace PurgeDemoCommands
         {
             Log.Debug("reading demo from {Filename}", filename);
 
+            return Parse(filename);
+        }
+
+        private void EnsureDemoIsReadable(string filename)
+        {
+            Log.Debug("testing demo {Filename}", filename);
+
+            Parse(filename);
+
+            Log.Debug("test successfull for demo {Filename}", filename);
+        }
+
+        private static DemoReader Parse(string filename)
+        {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read))
             {
                 return DemoReader.FromStream(stream);

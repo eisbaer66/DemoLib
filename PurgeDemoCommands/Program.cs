@@ -41,6 +41,7 @@ namespace PurgeDemoCommands
             {
                 Filenames = filenames,
                 Suffix = options.Suffix,
+                SkipTest = options.SkipTest,
             };
             return command;
         }

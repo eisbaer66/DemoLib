@@ -15,6 +15,9 @@ namespace PurgeDemoCommands
         [Option('s', "suffix", DefaultValue = "_purged", HelpText = "suffix of generated file")]
         public string Suffix { get; set; }
 
+        [Option('t', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
+        public bool SkipTest { get; set; }
+
         [HelpOption(HelpText = "Display this help screen.")]
         public string GetUsage()
         {
