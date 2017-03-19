@@ -1,4 +1,6 @@
-# PurgeDemoCommands
+# PurgeDemoCommands 
+[![Build Status](https://travis-ci.org/eisbaer66/PurgeDemoCommands.svg?branch=purge)](https://travis-ci.org/eisbaer66/PurgeDemoCommands)
+
 purges all console commands from demo files
 
 ```
