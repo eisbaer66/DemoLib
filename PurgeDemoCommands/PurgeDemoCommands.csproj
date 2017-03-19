@@ -81,10 +81,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
-    <Compile Include="FileAlreadyExistsException.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PurgeException.cs" />
+    <Compile Include="Result.cs" />
+    <Compile Include="Warning.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

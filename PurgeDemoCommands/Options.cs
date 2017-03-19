@@ -18,8 +18,11 @@ namespace PurgeDemoCommands
         [Option('t', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
         public bool SkipTest { get; set; }
 
-        [Option('o', "overwrite", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
+        [Option('o', "overwrite", DefaultValue = false, HelpText = "overwrites existing (purged) files")]
         public bool Overwrite { get; set; }
+
+        [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
+        public bool ShowSummary { get; set; }
 
         [HelpOption(HelpText = "Display this help screen.")]
         public string GetUsage()

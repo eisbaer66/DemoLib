@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Threading.Tasks;
 using CommandLine;
 using Serilog;
+using Serilog.Formatting.Json;
 
 namespace PurgeDemoCommands
 {
@@ -23,28 +25,37 @@ namespace PurgeDemoCommands
             try
             {
                 Command command = SetupCommand(options);
-                command.Execute();
-            }
-            catch (AggregateException exception)
-            {
-                //handle FileAlreadyExistsException
-                var fileAlreadyExistsExceptions = exception.InnerExceptions.OfType<FileAlreadyExistsException>();
-                var filenames = fileAlreadyExistsExceptions.Select(e => e.Filename).ToArray();
-                _logger.Warning("following files were not writen, because they already exist - specify '-o' to overwrite existing files {ExistingFiles}", filenames);
+                Task<Result>[] tasks = command.Execute().ToArray();
+                Task.WaitAll(tasks);
 
-                //log and throw remaining exceptions
-                var exceptions = exception.InnerExceptions.Where(e => !(e is FileAlreadyExistsException)).ToArray();
-                if (exceptions.Length > 0)
-                {
-                    Exception aggregateException = new AggregateException(exceptions);
-                    _logger.Fatal(aggregateException, "fatal error");
-                    throw aggregateException;
-                }
+                LogResults(tasks.Select(t => t.Result).ToArray(), options);
             }
             catch (Exception e)
             {
                 _logger.Fatal(e, "fatal error");
                 throw;
+            }
+        }
+
+        private static void LogResults(ICollection<Result> results, Options options)
+        {
+            var existingFiles = results.Where(r => r.Warning.HasFlag(Warning.FileAlreadyExists)).Select(e => e.NewFilepath).ToArray();
+            if (existingFiles.Length > 0)
+                _logger.Warning("following files were not written, because they already exist - specify '-o' to overwrite existing files {ExistingFiles}", existingFiles);
+
+            var resultsWithOtherWarnings = results.Where(r => r.Warning.HasFlag(~Warning.FileAlreadyExists)).ToArray();
+            foreach (Result result in resultsWithOtherWarnings)
+            {
+                _logger.Warning("{Warning} for demo {Filename} -> {NewFilename}", result.Warning, result.Filename, result.NewFilepath);
+            }
+
+            if (!options.ShowSummary)
+                return;
+
+            var successfullResults = results.Where(r => !r.Warning.HasFlag(~Warning.None)).ToArray();
+            foreach (Result result in successfullResults)
+            {
+                _logger.Information("purged demo {Filename} -> {NewFilename}", result.Filename, result.NewFilepath);
             }
         }
 
@@ -95,6 +106,8 @@ namespace PurgeDemoCommands
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
+                .MinimumLevel.Verbose()
+                .WriteTo.RollingFile(new JsonFormatter(), Environment.ExpandEnvironmentVariables("%TEMP%\\icebear\\Tf2PurgeDemo\\log-{Date}.json"))
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
                 .CreateLogger();

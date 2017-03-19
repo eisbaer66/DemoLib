@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DemoLib;
 using DemoLib.Commands;
 using Serilog;
@@ -24,7 +25,7 @@ namespace PurgeDemoCommands
         public bool SkipTest { get; set; }
         public bool Overwrite { get; set; }
 
-        public void Execute()
+        public IEnumerable<Task<Result>> Execute()
         {
             if (Filenames == null)
                 throw new ArgumentNullException(nameof(Filenames));
@@ -33,62 +34,67 @@ namespace PurgeDemoCommands
             if (Filenames.Count == 0)
                 throw new ArgumentException("no file specified", nameof(Suffix));
 
-            List<Exception> exceptions = new List<Exception>();
-            foreach (string filename in Filenames)
+            return Filenames.Select(Purge);
+        }
+
+        private async Task<Result> Purge(string filename)
+        {
+            try
             {
-                try
+                Log.Information("purging {Filename}", filename);
+
+                DemoReader demo = ParseDemo(filename);
+
+                return await ReplaceCommandsWithTempFile(filename, demo);
+            }
+            catch (Exception e)
+            {
+                throw new PurgeException(filename, e);
+            }
+        }
+
+        private async Task<Result> ReplaceCommandsWithTempFile(string filename, DemoReader demo)
+        {
+            Result result = new Result(filename);
+
+            string newFilename = Path.GetFileNameWithoutExtension(filename) + Suffix + Path.GetExtension(filename);
+            result.NewFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
+
+            bool overwriting = false;
+            if (File.Exists(result.NewFilepath))
+            {
+                if (Overwrite)
+                    overwriting = true;
+                else
                 {
-                    Purge(filename);
-                }
-                catch (Exception e)
-                {
-                    exceptions.Add(e);
+                    result.Warning |= Warning.FileAlreadyExists;
+                    return result;
                 }
             }
 
-            if (exceptions.Count > 0)
-                throw new AggregateException(exceptions);
-        }
-
-        private void Purge(string filename)
-        {
-            DemoReader demo = ParseDemo(filename);
-
-            ReplaceCommandsWithTempFile(filename, demo);
-        }
-
-        private void ReplaceCommandsWithTempFile(string filename, DemoReader demo)
-        {
             using (TempFileCollection tempFileCollection = new TempFileCollection())
             {
                 string tempFilename = tempFileCollection.AddExtension("dem");
                 File.Copy(filename, tempFilename);
 
 
-                ReplaceCommandsIn(demo, tempFilename);
+                await ReplaceCommandsIn(demo, tempFilename);
                 if (!SkipTest)
                     EnsureDemoIsReadable(tempFilename);
-
-
-                string newFilename = Path.GetFileNameWithoutExtension(filename) + Suffix + Path.GetExtension(filename);
-                string newFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
-
-                if (File.Exists(newFilepath))
+                
+                if (overwriting)
                 {
-                    if (Overwrite)
-                    {
-                        Log.Debug("deleting {NewFilename} to overwrite", newFilepath);
-                        File.Delete(newFilepath);
-                    }
-                    else
-                        throw new FileAlreadyExistsException(newFilepath);
+                    Log.Debug("deleting {NewFilename} to overwrite", result.NewFilepath);
+                    File.Delete(result.NewFilepath);
                 }
-                Log.Debug("writing purged content to {NewFilename}", newFilepath);
-                File.Copy(tempFilename, newFilepath, true);
+
+                Log.Debug("writing purged content to {NewFilename}", result.NewFilepath);
+                File.Copy(tempFilename, result.NewFilepath, true);
             }
+            return result;
         }
 
-        private static void ReplaceCommandsIn(DemoReader demo, string filename)
+        private static async Task ReplaceCommandsIn(DemoReader demo, string filename)
         {
             var commands = ExtractCommands(demo);
             Log.Debug("replacing {CommandCount} commands using {TempFilename}", commands.Length, filename);
@@ -97,11 +103,11 @@ namespace PurgeDemoCommands
             var matches = Match(filename, regex);
             Log.Debug("found {CountOccurrences} occurrences", matches.Length);
 
-            ReplaceMatches(filename, matches);
+            await ReplaceMatches(filename, matches);
             Log.Debug("{CountOccurrences} occurrences in {TempFilename} replaces", matches.Length, filename);
         }
 
-        private static void ReplaceMatches(string filename, IEnumerable<Group> matches)
+        private static async Task ReplaceMatches(string filename, IEnumerable<Group> matches)
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite))
             {
@@ -113,7 +119,7 @@ namespace PurgeDemoCommands
 
                     stream.Seek(bytesToMove, SeekOrigin.Current);
                     byte[] array = Enumerable.Range(1, match.Length).Select(i => (byte) 0).ToArray();
-                    stream.Write(array, 0, match.Length);
+                    await stream.WriteAsync(array, 0, match.Length);
                 }
             }
         }
