@@ -68,8 +68,12 @@ namespace TF2Net
 
 				case NetMessageType.SVC_UNKNKOWN_34:		return new NetGameEventListMessage();
 
-				default:	throw new NotImplementedException(string.Format("Unimplemented {0} \"{1}\"", typeof(NetMessageType).Name, type));
-			}
-		}
+#if DEBUG
+			    default: return new DebugMessage { Type = type };
+#else
+                default:                                    throw new NotImplementedException(string.Format("Unimplemented {0} \"{1}\"", typeof(NetMessageType).Name, type));
+#endif
+            }
+        }
 	}
 }

@@ -72,6 +72,7 @@
     <Compile Include="Monitors\EntityPropertyMonitor.cs" />
     <Compile Include="Monitors\MultiPropertyMonitor.cs" />
     <Compile Include="Extensions\BitStreamExtensions.cs" />
+    <Compile Include="NetMessages\DebugMessage.cs" />
     <Compile Include="NetMessages\NetCrosshairangleMessage.cs" />
     <Compile Include="NetMessages\Shared\EntityCoder.cs" />
     <Compile Include="NetMessages\SomeBitMessage.cs" />
