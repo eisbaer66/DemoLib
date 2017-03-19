@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
@@ -24,6 +25,22 @@ namespace PurgeDemoCommands
                 Command command = SetupCommand(options);
                 command.Execute();
             }
+            catch (AggregateException exception)
+            {
+                //handle FileAlreadyExistsException
+                var fileAlreadyExistsExceptions = exception.InnerExceptions.OfType<FileAlreadyExistsException>();
+                var filenames = fileAlreadyExistsExceptions.Select(e => e.Filename).ToArray();
+                _logger.Warning("following files were not writen, because they already exist - specify '-o' to overwrite existing files {ExistingFiles}", filenames);
+
+                //log and throw remaining exceptions
+                var exceptions = exception.InnerExceptions.Where(e => !(e is FileAlreadyExistsException)).ToArray();
+                if (exceptions.Length > 0)
+                {
+                    Exception aggregateException = new AggregateException(exceptions);
+                    _logger.Fatal(aggregateException, "fatal error");
+                    throw aggregateException;
+                }
+            }
             catch (Exception e)
             {
                 _logger.Fatal(e, "fatal error");
@@ -42,6 +59,7 @@ namespace PurgeDemoCommands
                 Filenames = filenames,
                 Suffix = options.Suffix,
                 SkipTest = options.SkipTest,
+                Overwrite = options.Overwrite,
             };
             return command;
         }

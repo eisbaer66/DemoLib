@@ -18,6 +18,9 @@ namespace PurgeDemoCommands
         [Option('t', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
         public bool SkipTest { get; set; }
 
+        [Option('o', "overwrite", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
+        public bool Overwrite { get; set; }
+
         [HelpOption(HelpText = "Display this help screen.")]
         public string GetUsage()
         {

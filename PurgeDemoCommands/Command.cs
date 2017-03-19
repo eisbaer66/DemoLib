@@ -22,6 +22,7 @@ namespace PurgeDemoCommands
         public IList<string> Filenames { get; set; }
         public string Suffix { get; set; }
         public bool SkipTest { get; set; }
+        public bool Overwrite { get; set; }
 
         public void Execute()
         {
@@ -72,9 +73,17 @@ namespace PurgeDemoCommands
                 string newFilename = Path.GetFileNameWithoutExtension(filename) + Suffix + Path.GetExtension(filename);
                 string newFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
 
-                Log.Debug("writing purged content to {NewFilename}", newFilepath);
                 if (File.Exists(newFilepath))
-                    File.Delete(newFilepath);
+                {
+                    if (Overwrite)
+                    {
+                        Log.Debug("deleting {NewFilename} to overwrite", newFilepath);
+                        File.Delete(newFilepath);
+                    }
+                    else
+                        throw new FileAlreadyExistsException(newFilepath);
+                }
+                Log.Debug("writing purged content to {NewFilename}", newFilepath);
                 File.Copy(tempFilename, newFilepath, true);
             }
         }
