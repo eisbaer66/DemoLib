@@ -53,8 +53,10 @@ namespace TF2Net
 				case NetMessageType.SVC_SOUND:				return new NetSoundMessage();
 				case NetMessageType.SVC_SETVIEW:			return new NetSetViewMessage();
 				case NetMessageType.SVC_FIXANGLE:			return new NetFixAngleMessage();
+			    case NetMessageType.SVC_CROSSHAIRANGLE:     return new NetCrosshairangleMessage();
+                case NetMessageType.SVC_BSPDECAL:           return new NetBspDecalMessage();
 
-				case NetMessageType.SVC_USERMESSAGE:		return new NetUsrMsgMessage();
+                case NetMessageType.SVC_USERMESSAGE:		return new NetUsrMsgMessage();
 
 				case NetMessageType.SVC_ENTITYMESSAGE:		return new NetEntityMessage();
 				case NetMessageType.SVC_GAMEEVENT:			return new NetGameEventMessage();
@@ -64,8 +66,14 @@ namespace TF2Net
 
 				case NetMessageType.SVC_GAMEEVENTLIST:		return new NetGameEventListMessage();
 
-				default:	throw new NotImplementedException(string.Format("Unimplemented {0} \"{1}\"", typeof(NetMessageType).Name, type));
-			}
-		}
+				case NetMessageType.SVC_UNKNKOWN_34:		return new SomeBitMessage(10);
+
+#if DEBUG
+			    default: return new DebugMessage { Type = type };
+#else
+                default:                                    throw new NotImplementedException(string.Format("Unimplemented {0} \"{1}\"", typeof(NetMessageType).Name, type));
+#endif
+            }
+        }
 	}
 }
