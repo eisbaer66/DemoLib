@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DemoLib.Commands
 {
-	class TimestampedDemoCommand : DemoCommand
+    public class TimestampedDemoCommand : DemoCommand
 	{
 		public int Tick { get; set; }
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DemoLib.Commands
 {
 	[DebuggerDisplay("{DebuggerDisplayAttributeValue,nq}")]
-	sealed class DemoConsoleCommand : TimestampedDemoCommand
+	public sealed class DemoConsoleCommand : TimestampedDemoCommand
 	{
 		public string Command { get; set; }
 
