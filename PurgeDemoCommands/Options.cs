@@ -31,7 +31,6 @@ namespace PurgeDemoCommands
             var help = new HelpText
             {
                 Heading = new HeadingInfo("PurgeDemoCommands", version.ToString()),
-                Copyright = new CopyrightInfo("icebear", 2017),
                 AdditionalNewLineAfterOption = true,
                 AddDashesToOption = true
             };
