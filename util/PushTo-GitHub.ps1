@@ -1,10 +1,9 @@
 ﻿param(
 [string]$GitHubToken,
-[string]$ReleaseName)
+[string]$ReleaseName,
+[string]$ZipLocation)
 
 $ErrorActionPreference = "Stop"
-
-$zipLocation = "$Env:SYSTEM_DEFAULTWORKINGDIRECTORY/Demolib/zip/PurgeDemoCommands.zip"
 
 $authheader = "Basic " + ([Convert]::ToBase64String([System.Text.encoding]::ASCII.GetBytes($GitHubToken)))
 $header = @{Authorization=$authheader}
