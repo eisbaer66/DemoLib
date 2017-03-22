@@ -81,6 +81,9 @@ namespace PurgeDemoCommands
 
             if (!Parser.Default.ParseArguments(args, options))
             {
+                if (args.Contains("-h") || args.Contains("--help"))
+                    Environment.Exit(0);
+
                 _logger.Fatal("could not parse parameters");
                 Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(1);
