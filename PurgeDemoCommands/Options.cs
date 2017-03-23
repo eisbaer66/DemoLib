@@ -20,7 +20,7 @@ namespace PurgeDemoCommands
         [Option('b', "blacklist", HelpText = "path to file containing blacklist for DemoCommands", MutuallyExclusiveSet = "filter")]
         public string BlacklistPath { get; set; }
 
-        [Option('t', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
+        [Option('s', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
         public bool SkipTest { get; set; }
 
         [Option('o', "overwrite", DefaultValue = false, HelpText = "overwrites existing (purged) files")]
