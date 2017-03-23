@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B2593870-A854-45AF-BF58-F20F631F5209}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
+		util\PushTo-GitHub.ps1 = util\PushTo-GitHub.ps1
 	EndProjectSection
 EndProject
 Global
