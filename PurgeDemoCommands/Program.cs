@@ -19,6 +19,8 @@ namespace PurgeDemoCommands
             _logger.Verbose("started with parameters {Args}", args);
 
             Options options = ParseOptions(args);
+            if (options == null)
+                return;
 
             try
             {
@@ -106,7 +108,7 @@ namespace PurgeDemoCommands
                 if (args.Contains("-h") || args.Contains("--help"))
                 {
                     _logger.Debug("showing help");
-                    Environment.Exit(0);
+                   return null;
                 }
 
                 _logger.Fatal("could not parse parameters");
