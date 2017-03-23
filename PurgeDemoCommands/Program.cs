@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 using CommandLine;
 using Serilog;
@@ -61,31 +59,57 @@ namespace PurgeDemoCommands
 
         private static Command SetupCommand(Options options)
         {
-            var filenames = options.Files
-                .SelectMany(f => Directory.Exists(f) ? Directory.GetFiles(f) : new[] {f})
-                .Where(f => !f.EndsWith(options.Suffix + Path.GetExtension(f)))
-                .ToList();
+            string[] whitelist = GetCommandsFromFile(options.WhitelistPath);
+            string[] blacklist = GetCommandsFromFile(options.BlacklistPath);
             Command command = new Command
             {
-                Filenames = filenames,
+                Filenames = GetFiles(options),
                 Suffix = options.Suffix,
                 SkipTest = options.SkipTest,
+                Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
             };
             return command;
+        }
+
+        private static List<string> GetFiles(Options options)
+        {
+            return options.Files
+                .SelectMany(f => Directory.Exists(f) ? Directory.GetFiles(f) : new[] {f})
+                .Where(f => !f.EndsWith(options.Suffix + Path.GetExtension(f)))
+                .ToList();
+        }
+
+        private static string[] GetCommandsFromFile(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            if (!File.Exists(path))
+                return new string[0];
+
+            return File.ReadAllLines(path);
         }
 
         private static Options ParseOptions(string[] args)
         {
             Options options = new Options();
 
-            if (!Parser.Default.ParseArguments(args, options))
+            Parser parser = new Parser(s =>
+            {
+                s.MutuallyExclusive = true;
+                s.HelpWriter = Console.Error;
+            });
+            
+            if (!parser.ParseArguments(args, options))
             {
                 if (args.Contains("-h") || args.Contains("--help"))
+                {
+                    _logger.Debug("showing help");
                     Environment.Exit(0);
+                }
 
                 _logger.Fatal("could not parse parameters");
-                Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(1);
             }
 

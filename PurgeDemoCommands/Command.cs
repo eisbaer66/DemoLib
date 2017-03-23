@@ -24,6 +24,7 @@ namespace PurgeDemoCommands
         public string Suffix { get; set; }
         public bool SkipTest { get; set; }
         public bool Overwrite { get; set; }
+        public IFilter Filter { get; set; }
 
         public IEnumerable<Task<Result>> Execute()
         {
@@ -94,7 +95,7 @@ namespace PurgeDemoCommands
             return result;
         }
 
-        private static async Task ReplaceCommandsIn(DemoReader demo, string filename)
+        private async Task ReplaceCommandsIn(DemoReader demo, string filename)
         {
             var commands = ExtractCommands(demo);
             Log.Debug("replacing {CommandCount} commands using {TempFilename}", commands.Length, filename);
@@ -143,12 +144,13 @@ namespace PurgeDemoCommands
             return new Regex(string.Join("|", regexParts));
         }
 
-        private static string[] ExtractCommands(DemoReader demo)
+        private string[] ExtractCommands(DemoReader demo)
         {
             return demo.Commands
                 .OfType<DemoConsoleCommand>()
                 .Select(c => c.Command)
                 .Distinct()
+                .Where(Filter.Match)
                 .ToArray();
         }
 

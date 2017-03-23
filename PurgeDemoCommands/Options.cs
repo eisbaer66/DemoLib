@@ -15,6 +15,12 @@ namespace PurgeDemoCommands
         [Option('s', "suffix", DefaultValue = "_purged", HelpText = "suffix of generated file")]
         public string Suffix { get; set; }
 
+        [Option('w', "whitelist", HelpText = "path to file containing whitelist for DemoCommands", MutuallyExclusiveSet = "filter")]
+        public string WhitelistPath { get; set; }
+
+        [Option('b', "blacklist", HelpText = "path to file containing blacklist for DemoCommands", MutuallyExclusiveSet = "filter")]
+        public string BlacklistPath { get; set; }
+
         [Option('t', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
         public bool SkipTest { get; set; }
 
