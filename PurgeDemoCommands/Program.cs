@@ -100,7 +100,6 @@ namespace PurgeDemoCommands
             Parser parser = new Parser(s =>
             {
                 s.MutuallyExclusive = true;
-                s.HelpWriter = Console.Error;
             });
             
             if (!parser.ParseArguments(args, options))
@@ -108,10 +107,12 @@ namespace PurgeDemoCommands
                 if (args.Contains("-h") || args.Contains("--help"))
                 {
                     _logger.Debug("showing help");
+                    Console.Out.WriteLine(options.GetUsage());
                    return null;
                 }
 
                 _logger.Fatal("could not parse parameters");
+                Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(1);
             }
 
