@@ -64,7 +64,7 @@ namespace PurgeDemoCommands
             Command command = new Command
             {
                 Filenames = GetFiles(options),
-                Suffix = options.Suffix,
+                NewFilePattern = options.NewFilePattern,
                 SkipTest = options.SkipTest,
                 Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
@@ -76,7 +76,7 @@ namespace PurgeDemoCommands
         {
             return options.Files
                 .SelectMany(f => Directory.Exists(f) ? Directory.GetFiles(f) : new[] {f})
-                .Where(f => !f.EndsWith(options.Suffix + Path.GetExtension(f)))
+                .Where(f => !f.EndsWith(options.NewFilePattern + Path.GetExtension(f)))
                 .ToList();
         }
 
@@ -120,9 +120,9 @@ namespace PurgeDemoCommands
                 Environment.Exit(2);
             }
 
-            if (string.IsNullOrEmpty(options.Suffix))
+            if (string.IsNullOrEmpty(options.NewFilePattern))
             {
-                _logger.Fatal("suffix has to be specified");
+                _logger.Fatal("name pattern has to be specified");
                 Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(3);
             }

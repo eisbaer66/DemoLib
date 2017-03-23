@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using CommandLine;
 using CommandLine.Text;
 
@@ -12,8 +11,8 @@ namespace PurgeDemoCommands
         [ValueList(typeof(List<string>))]
         public IList<string> Files { get; set; }
 
-        [Option('s', "suffix", DefaultValue = "_purged", HelpText = "suffix of generated file")]
-        public string Suffix { get; set; }
+        [Option('n', "name", DefaultValue = "{0}_purged.dem", HelpText = "name pattern of generated file")]
+        public string NewFilePattern { get; set; }
 
         [Option('w', "whitelist", HelpText = "path to file containing whitelist for DemoCommands", MutuallyExclusiveSet = "filter")]
         public string WhitelistPath { get; set; }

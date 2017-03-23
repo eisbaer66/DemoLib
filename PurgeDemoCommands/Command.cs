@@ -21,7 +21,7 @@ namespace PurgeDemoCommands
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<Command>();
 
         public IList<string> Filenames { get; set; }
-        public string Suffix { get; set; }
+        public string NewFilePattern { get; set; }
         public bool SkipTest { get; set; }
         public bool Overwrite { get; set; }
         public IFilter Filter { get; set; }
@@ -30,10 +30,10 @@ namespace PurgeDemoCommands
         {
             if (Filenames == null)
                 throw new ArgumentNullException(nameof(Filenames));
-            if (Suffix == null)
-                throw new ArgumentNullException(nameof(Suffix));
+            if (NewFilePattern == null)
+                throw new ArgumentNullException(nameof(NewFilePattern));
             if (Filenames.Count == 0)
-                throw new ArgumentException("no file specified", nameof(Suffix));
+                throw new ArgumentException("no file specified", nameof(NewFilePattern));
 
             return Filenames.Select(Purge);
         }
@@ -57,8 +57,8 @@ namespace PurgeDemoCommands
         private async Task<Result> ReplaceCommandsWithTempFile(string filename, DemoReader demo)
         {
             Result result = new Result(filename);
-
-            string newFilename = Path.GetFileNameWithoutExtension(filename) + Suffix + Path.GetExtension(filename);
+            
+            string newFilename = string.Format(NewFilePattern, Path.GetFileNameWithoutExtension(filename));
             result.NewFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
 
             bool overwriting = false;
