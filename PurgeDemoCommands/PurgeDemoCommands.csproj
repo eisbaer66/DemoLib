@@ -126,13 +126,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DemoLib\DemoLib.csproj">
-      <Project>{95495901-1A5C-47A2-BB54-8F7EE9004A77}</Project>
-      <Name>DemoLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="comandlist.txt" />
+    <Content Include="commandlist.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

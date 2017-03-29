@@ -26,7 +26,7 @@ namespace PurgeDemoCommands
         [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
         public bool ShowSummary { get; set; }
 
-        [Option('c', "commandList", DefaultValue = "comandlist.txt", HelpText = "path to file containing all DemoCommands")]
+        [Option('c', "commandList", DefaultValue = "commandlist.txt", HelpText = "path to file containing all DemoCommands")]
         public string CommandList { get; set; }
 
         [Option('u', "updateCommandList", DefaultValue = false, HelpText = "updates list of commands")]
