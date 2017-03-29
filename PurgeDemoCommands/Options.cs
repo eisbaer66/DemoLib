@@ -23,7 +23,7 @@ namespace PurgeDemoCommands
         [Option('o', "overwrite", DefaultValue = false, HelpText = "overwrites existing (purged) files")]
         public bool Overwrite { get; set; }
 
-        [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
+        [Option('s', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
         public bool ShowSummary { get; set; }
 
         [Option('c', "commandList", DefaultValue = "commandlist.txt", HelpText = "path to file containing all DemoCommands")]
@@ -44,9 +44,10 @@ namespace PurgeDemoCommands
             };
             help.AddPreOptionsLine(" ");
             help.AddPreOptionsLine("Usage: PurgeDemoCommands.exe awesome.dem other.dem");
-            help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path\\to\\demos\\awesome.dem\"");
-            help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path\\to\\demos\"");
-            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -s {0}_clean.dem");
+            help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path to demos\\awesome.dem\"");
+            help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path to demos\"");
+            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -n {0}_clean.dem");
+            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -o -s -u");
             help.AddPreOptionsLine(string.Empty);
             help.AddPreOptionsLine("Options:");
             help.AddOptions(this);
