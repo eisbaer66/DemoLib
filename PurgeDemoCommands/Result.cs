@@ -7,6 +7,7 @@ namespace PurgeDemoCommands
         public string Filename { get; }
         public Warning Warning { get; set; }
         public string NewFilepath { get; set; }
+        public string ErrorText { get; set; }
 
         public Result(string filename)
         {

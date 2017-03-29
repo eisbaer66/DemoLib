@@ -53,11 +53,27 @@ namespace PurgeDemoCommands
 
         private static void LogResults(ICollection<Result> results, Options options)
         {
+            var resultsErrors = results.Where(r => !string.IsNullOrEmpty(r.ErrorText)).ToArray();
             var existingFiles = results.Where(r => r.Warning.HasFlag(Warning.FileAlreadyExists)).Select(e => e.NewFilepath).ToArray();
+            var resultsWithOtherWarnings = results.Where(r => r.Warning.HasFlag(~Warning.FileAlreadyExists)).ToArray();
+            var successfullResults = results.Where(r => !r.Warning.HasFlag(~Warning.None) && string.IsNullOrEmpty(r.ErrorText)).ToArray();
+
+            Console.WriteLine();
+            _logger.Information(
+                "finished parsing {ResultCount} files with \r\n\t{ErrorCount} errors, \r\n\t{WaringCount} warnings and \r\n\t{SuccessCount} successes",
+                results.Count,
+                resultsErrors.Length,
+                existingFiles.Length + resultsWithOtherWarnings.Length,
+                successfullResults.Length);
+
+            foreach (Result result in resultsErrors)
+            {
+                _logger.Error("error purging demo {Filename}: {ErrorText}", result.Filename, result.ErrorText);
+            }
+
             if (existingFiles.Length > 0)
                 _logger.Warning("following files were not written, because they already exist - specify '-o' to overwrite existing files {ExistingFiles}", existingFiles);
 
-            var resultsWithOtherWarnings = results.Where(r => r.Warning.HasFlag(~Warning.FileAlreadyExists)).ToArray();
             foreach (Result result in resultsWithOtherWarnings)
             {
                 _logger.Warning("{Warning} for demo {Filename} -> {NewFilename}", result.Warning, result.Filename, result.NewFilepath);
@@ -66,7 +82,6 @@ namespace PurgeDemoCommands
             if (!options.ShowSummary)
                 return;
 
-            var successfullResults = results.Where(r => !r.Warning.HasFlag(~Warning.None)).ToArray();
             foreach (Result result in successfullResults)
             {
                 _logger.Information("purged demo {Filename} -> {NewFilename}", result.Filename, result.NewFilepath);

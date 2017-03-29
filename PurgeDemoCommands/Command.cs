@@ -84,7 +84,11 @@ namespace PurgeDemoCommands
             }
             catch (Exception e)
             {
-                throw new PurgeException(filename, e);
+                Log.Error(e, "error while purging {Filename}", filename);
+                return new Result(filename)
+                {
+                    ErrorText = e.Message,
+                };
             }
         }
 
