@@ -11,7 +11,7 @@ namespace PurgeDemoCommands
         [ValueList(typeof(List<string>))]
         public IList<string> Files { get; set; }
 
-        [Option('n', "name", DefaultValue = "{0}_purged.dem", HelpText = "name pattern of generated file")]
+        [Option('n', "name", DefaultValue = "purged\\{0}.dem", HelpText = "name pattern of generated file")]
         public string NewFilePattern { get; set; }
 
         [Option('w', "whitelist", HelpText = "path to file containing whitelist for DemoCommands", MutuallyExclusiveSet = "filter")]
@@ -26,7 +26,7 @@ namespace PurgeDemoCommands
         [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
         public bool ShowSummary { get; set; }
 
-        [Option('c', "commandList", DefaultValue = "comandlist.txt", HelpText = "filename of comandlist")]
+        [Option('c', "commandList", DefaultValue = "comandlist.txt", HelpText = "path to file containing all DemoCommands")]
         public string CommandList { get; set; }
 
         [Option('u', "updateCommandList", DefaultValue = false, HelpText = "updates list of commands")]
@@ -46,7 +46,7 @@ namespace PurgeDemoCommands
             help.AddPreOptionsLine("Usage: PurgeDemoCommands.exe awesome.dem other.dem");
             help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path\\to\\demos\\awesome.dem\"");
             help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path\\to\\demos\"");
-            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -s _clean");
+            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -s {0}_clean.dem");
             help.AddPreOptionsLine(string.Empty);
             help.AddPreOptionsLine("Options:");
             help.AddOptions(this);
