@@ -20,14 +20,17 @@ namespace PurgeDemoCommands
         [Option('b', "blacklist", HelpText = "path to file containing blacklist for DemoCommands", MutuallyExclusiveSet = "filter")]
         public string BlacklistPath { get; set; }
 
-        [Option('s', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
-        public bool SkipTest { get; set; }
-
         [Option('o', "overwrite", DefaultValue = false, HelpText = "overwrites existing (purged) files")]
         public bool Overwrite { get; set; }
 
         [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
         public bool ShowSummary { get; set; }
+
+        [Option('c', "commandList", DefaultValue = "comandlist.txt", HelpText = "filename of comandlist")]
+        public string CommandList { get; set; }
+
+        [Option('u', "updateCommandList", DefaultValue = false, HelpText = "updates list of commands")]
+        public bool UpdateComandList { get; set; }
 
         [HelpOption(HelpText = "Display this help screen.")]
         public string GetUsage()

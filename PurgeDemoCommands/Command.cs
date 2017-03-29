@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DemoLib;
-using DemoLib.Commands;
+using System.Threading.Tasks.Dataflow;
+using Ganss.Text;
+using MoreLinq;
 using Serilog;
 
 namespace PurgeDemoCommands
@@ -19,14 +19,52 @@ namespace PurgeDemoCommands
     internal class Command
     {
         private static readonly ILogger Log = Serilog.Log.Logger.ForContext<Command>();
+        private AhoCorasick _ahoCorasick;
+        private int _commandCount;
 
         public IList<string> Filenames { get; set; }
         public string NewFilePattern { get; set; }
-        public bool SkipTest { get; set; }
         public bool Overwrite { get; set; }
         public IFilter Filter { get; set; }
 
+        public void SetCommands(string[] value)
+        {
+            _commandCount = value.Length;
+
+            _ahoCorasick = new AhoCorasick(value);
+        }
+
+        public async Task<IEnumerable<Result>> ExecuteThrottled()
+        {
+            GuardArguments();
+
+            TransformBlock<string, Result> purges = new TransformBlock<string, Result>(file => Purge(file), new ExecutionDataflowBlockOptions {MaxDegreeOfParallelism = Environment.ProcessorCount });
+            BufferBlock<Result> buffer = new BufferBlock<Result>();
+            purges.LinkTo(buffer);
+
+            foreach (string filename in Filenames)
+            {
+                purges.Post(filename);
+            }
+
+            purges.Complete();
+            await purges.Completion;
+
+            IList<Result> results;
+            if (buffer.TryReceiveAll(out results))
+                return results;
+
+            throw new ExecuteException();
+        }
+
         public IEnumerable<Task<Result>> Execute()
+        {
+            GuardArguments();
+
+            return Filenames.Select(Purge);
+        }
+
+        private void GuardArguments()
         {
             if (Filenames == null)
                 throw new ArgumentNullException(nameof(Filenames));
@@ -34,8 +72,6 @@ namespace PurgeDemoCommands
                 throw new ArgumentNullException(nameof(NewFilePattern));
             if (Filenames.Count == 0)
                 throw new ArgumentException("no file specified", nameof(NewFilePattern));
-
-            return Filenames.Select(Purge);
         }
 
         private async Task<Result> Purge(string filename)
@@ -44,9 +80,7 @@ namespace PurgeDemoCommands
             {
                 Log.Information("purging {Filename}", filename);
 
-                DemoReader demo = ParseDemo(filename);
-
-                return await ReplaceCommandsWithTempFile(filename, demo);
+                return await ReplaceCommandsWithTempFile(filename);
             }
             catch (Exception e)
             {
@@ -54,7 +88,7 @@ namespace PurgeDemoCommands
             }
         }
 
-        private async Task<Result> ReplaceCommandsWithTempFile(string filename, DemoReader demo)
+        private async Task<Result> ReplaceCommandsWithTempFile(string filename)
         {
             Result result = new Result(filename);
             
@@ -79,10 +113,8 @@ namespace PurgeDemoCommands
                 File.Copy(filename, tempFilename);
 
 
-                await ReplaceCommandsIn(demo, tempFilename);
-                if (!SkipTest)
-                    EnsureDemoIsReadable(tempFilename);
-                
+                await ReplaceCommandsIn(tempFilename);
+
                 if (overwriting)
                 {
                     Log.Debug("deleting {NewFilename} to overwrite", result.NewFilepath);
@@ -95,87 +127,108 @@ namespace PurgeDemoCommands
             return result;
         }
 
-        private async Task ReplaceCommandsIn(DemoReader demo, string filename)
+        private async Task ReplaceCommandsIn(string filename)
         {
-            var commands = ExtractCommands(demo);
-            Log.Debug("replacing {CommandCount} commands using {TempFilename}", commands.Length, filename);
-
-            Regex regex = CreateRegex(commands);
-            var matches = Match(filename, regex);
+            Log.Debug("replacing {CommandCount} commands using {TempFilename}", _commandCount, filename);
+            
+            string content = File.ReadAllText(filename, Encoding.ASCII);
+            var matches = Match(content).ToArray();
             Log.Debug("found {CountOccurrences} occurrences", matches.Length);
 
             await ReplaceMatches(filename, matches);
             Log.Debug("{CountOccurrences} occurrences in {TempFilename} replaces", matches.Length, filename);
         }
 
-        private static async Task ReplaceMatches(string filename, IEnumerable<Group> matches)
+        private static async Task ReplaceMatches(string filename, IEnumerable<WordMatch> matches)
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite))
             {
-                foreach (Group match in matches)
+                foreach (WordMatch match in matches)
                 {
-                    long bytesToMove = match.Index - stream.Position;
-                    if (bytesToMove < 0)
-                        throw new ApplicationException("unexpected index while replacing commands");
+                    MoveToPosition(stream, match.Index);
 
-                    stream.Seek(bytesToMove, SeekOrigin.Current);
-                    byte[] array = Enumerable.Range(1, match.Length).Select(i => (byte) 0).ToArray();
-                    await stream.WriteAsync(array, 0, match.Length);
+                    MoveToTextStart(stream);
+
+                    var messageTypeMatches = MessageTypeMatches(stream);
+                    if (!messageTypeMatches)
+                        continue;
+
+                    var expectedLength = await ReadExpectedLength(stream);
+                    var bytesTillNull = await FindTextLength(stream, expectedLength);
+                    if (bytesTillNull < 0)
+                        continue;
+
+                    Log.Verbose("replacing {ReplacesByteCount} Bytes for command {ReplacedCommand} at index {ReplacedIndex}", bytesTillNull, match.Word, match.Index);
+                    await WriteNulls(stream, bytesTillNull);
                 }
             }
         }
 
-        private static Group[] Match(string filename, Regex regex)
+        private static async Task<long> ReadExpectedLength(FileStream stream)
         {
-            string content = File.ReadAllText(filename, Encoding.ASCII);
-            return regex.Matches(content)
-                .Cast<Match>()
-                .SelectMany(m => m.Groups.Cast<Group>().Skip(1).Where(g => g.Success))
-                .OrderBy(m => m.Index)
-                .ToArray();
+            byte[] buffer = new byte[8];
+            await stream.ReadAsync(buffer, 0, 8);
+            long expectedLength = BitConverter.ToInt64(buffer, 0);
+            return expectedLength;
         }
 
-        private static Regex CreateRegex(string[] commands)
+        private static async Task WriteNulls(FileStream stream, long bytesTillNull)
         {
-            //  x04[\s\S]{8}(COMMAND)x00   starts with "a byte (value 4)" followed by "8 bytes (length of string)" followed by "the command" followed by "a byte (value 0)"
-            string startToken = ((char) 4).ToString();
-            IEnumerable<string> regexParts = commands.Select(
-                s => string.Format(@"{0}[\s\S]{{8}}({1})", Regex.Escape(startToken), Regex.Escape(s + "\0")));
-            return new Regex(string.Join("|", regexParts));
+            byte[] array = Enumerable.Range(1, (int) bytesTillNull).Select(i => (byte) 0).ToArray();
+            await stream.WriteAsync(array, 0, array.Length);
         }
 
-        private string[] ExtractCommands(DemoReader demo)
+        private static async Task<long> FindTextLength(FileStream stream, long expectedLength)
         {
-            return demo.Commands
-                .OfType<DemoConsoleCommand>()
-                .Select(c => c.Command)
-                .Distinct()
-                .Where(Filter.Match)
-                .ToArray();
-        }
-
-        private static DemoReader ParseDemo(string filename)
-        {
-            Log.Debug("reading demo from {Filename}", filename);
-
-            return Parse(filename);
-        }
-
-        private void EnsureDemoIsReadable(string filename)
-        {
-            Log.Debug("testing demo {Filename}", filename);
-
-            Parse(filename);
-
-            Log.Debug("test successfull for demo {Filename}", filename);
-        }
-
-        private static DemoReader Parse(string filename)
-        {
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read))
+            long textStartIndex = stream.Position;
+            int length = 0;
+            byte b = 1;
+            while (b != 0)
             {
-                return DemoReader.FromStream(stream);
+                if (length > expectedLength)
+                    return -1;
+
+                byte[] buffer = new byte[1];
+                await stream.ReadAsync(buffer, 0, 1);
+                b = buffer[0];
+                length++;
             }
+            long bytesTillNull = stream.Position - textStartIndex;
+            if (bytesTillNull > int.MaxValue)
+                throw new ArgumentOutOfRangeException("bytesTillNull");
+            stream.Seek(-bytesTillNull, SeekOrigin.Current);
+            return bytesTillNull;
+        }
+
+        private static void MoveToTextStart(FileStream stream)
+        {
+            stream.Seek(-1, SeekOrigin.Current);
+            while (char.IsWhiteSpace((char) stream.ReadByte()))
+            {
+                stream.Seek(-2, SeekOrigin.Current);
+            }
+        }
+
+        private static void MoveToPosition(FileStream stream, int index)
+        {
+            long bytesToMove = index - stream.Position;
+            stream.Seek(bytesToMove, SeekOrigin.Current);
+        }
+
+        private static bool MessageTypeMatches(FileStream stream)
+        {
+            stream.Seek(-9, SeekOrigin.Current);
+            int messageType = stream.ReadByte();
+            bool messageTypeMatches = messageType == 4;
+            return messageTypeMatches;
+        }
+
+        private IOrderedEnumerable<WordMatch> Match(string content)
+        {
+            return _ahoCorasick
+                .Search(content)
+                .DistinctBy(m => m.Index)
+                .OrderBy(m => m.Index);
         }
     }
 }

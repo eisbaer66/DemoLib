@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine;
+using Nito.AsyncEx;
 using Serilog;
 using Serilog.Formatting.Json;
 
@@ -24,17 +25,30 @@ namespace PurgeDemoCommands
 
             try
             {
-                Command command = SetupCommand(options);
-                Task<Result>[] tasks = command.Execute().ToArray();
-                Task.WaitAll(tasks);
-
-                LogResults(tasks.Select(t => t.Result).ToArray(), options);
+                AsyncContext.Run(() => Main(options));
             }
             catch (Exception e)
             {
                 _logger.Fatal(e, "fatal error");
                 throw;
             }
+        }
+
+        private static async void Main(Options options)
+        {
+            if (options.UpdateComandList || !File.Exists(options.CommandList))
+            {
+                UpdateComandListComand updateComandListComand = new UpdateComandListComand
+                {
+                    Path = options.CommandList,
+                };
+
+                await updateComandListComand.Execute();
+            }
+
+            Command command = SetupCommand(options);
+            IEnumerable<Result> results = await command.ExecuteThrottled();
+            LogResults(results.ToArray(), options);
         }
 
         private static void LogResults(ICollection<Result> results, Options options)
@@ -63,14 +77,16 @@ namespace PurgeDemoCommands
         {
             string[] whitelist = GetCommandsFromFile(options.WhitelistPath);
             string[] blacklist = GetCommandsFromFile(options.BlacklistPath);
+            string[] commands = GetCommandsFromFile(options.CommandList);
             Command command = new Command
             {
                 Filenames = GetFiles(options),
                 NewFilePattern = options.NewFilePattern,
-                SkipTest = options.SkipTest,
                 Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
             };
+            command.SetCommands(commands);
+
             return command;
         }
 
