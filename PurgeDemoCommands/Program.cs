@@ -25,7 +25,7 @@ namespace PurgeDemoCommands
 
             try
             {
-                AsyncContext.Run(() => Main(options));
+                AsyncContext.Run(() => MainAsync(options));
             }
             catch (Exception e)
             {
@@ -34,7 +34,7 @@ namespace PurgeDemoCommands
             }
         }
 
-        private static async void Main(Options options)
+        private static async void MainAsync(Options options)
         {
             if (options.UpdateComandList || !File.Exists(options.CommandList))
             {
