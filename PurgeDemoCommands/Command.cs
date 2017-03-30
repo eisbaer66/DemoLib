@@ -36,7 +36,9 @@ namespace PurgeDemoCommands
 
         public async Task<IEnumerable<Result>> ExecuteThrottled()
         {
-            GuardArguments();
+            Result result = GuardArguments();
+            if (result != null)
+                return new[] { result };
 
             TransformBlock<string, Result> purges = new TransformBlock<string, Result>(file => Purge(file), new ExecutionDataflowBlockOptions {MaxDegreeOfParallelism = Environment.ProcessorCount });
             BufferBlock<Result> buffer = new BufferBlock<Result>();
@@ -59,19 +61,23 @@ namespace PurgeDemoCommands
 
         public IEnumerable<Task<Result>> Execute()
         {
-            GuardArguments();
+            Result result = GuardArguments();
+            if (result != null)
+                return new[] {Task.FromResult(result) };
 
             return Filenames.Select(Purge);
         }
 
-        private void GuardArguments()
+        private Result GuardArguments()
         {
             if (Filenames == null)
-                throw new ArgumentNullException(nameof(Filenames));
+                return new Result("unknown") {ErrorText = "no files specified"};
             if (NewFilePattern == null)
-                throw new ArgumentNullException(nameof(NewFilePattern));
+                return new Result("unknown") { ErrorText = "no filepattern for new files specified" };
             if (Filenames.Count == 0)
-                throw new ArgumentException("no file specified", nameof(NewFilePattern));
+                return new Result("unknown") { ErrorText = "no files specified" };
+
+            return null;
         }
 
         private async Task<Result> Purge(string filename)
