@@ -108,7 +108,8 @@ namespace PurgeDemoCommands
         private static List<string> GetFiles(Options options)
         {
             return options.Files
-                .SelectMany(f => Directory.Exists(f) ? Directory.GetFiles(f) : new[] {f})
+                .SelectMany(f => Directory.Exists(f) ? Directory.GetFiles(f, "*.dem") : new[] {f})
+                .Where(f => f.EndsWith(".dem"))
                 .Where(f => !f.EndsWith(options.NewFilePattern + Path.GetExtension(f)))
                 .ToList();
         }
