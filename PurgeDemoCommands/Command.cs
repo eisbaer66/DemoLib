@@ -98,6 +98,7 @@ namespace PurgeDemoCommands
             
             string newFilename = string.Format(NewFilePattern, Path.GetFileNameWithoutExtension(filename));
             result.NewFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
+            string newDirectoryName = Path.GetDirectoryName(result.NewFilepath);
 
             bool overwriting = false;
             if (File.Exists(result.NewFilepath))
@@ -124,6 +125,8 @@ namespace PurgeDemoCommands
                     Log.Debug("deleting {NewFilename} to overwrite", result.NewFilepath);
                     File.Delete(result.NewFilepath);
                 }
+
+                Directory.CreateDirectory(newDirectoryName);
 
                 Log.Debug("writing purged content to {NewFilename}", result.NewFilepath);
                 File.Copy(tempFilename, result.NewFilepath, true);
