@@ -9,9 +9,20 @@ namespace PurgeDemoCommands.Specs
     [Binding]
     public class PurgePazerSteps
     {
-        private string _testDataPath;
         public string Arguments { get; set; }
         public int Timeout { get; set; }
+
+        private static string TestDataPath
+        {
+            get
+            {
+                return (string)ScenarioContext.Current["TestDataPath"];
+            }
+            set
+            {
+                ScenarioContext.Current["TestDataPath"] = value;
+            }
+        }
 
         [BeforeScenario()]
         public void BeforeScenario()
@@ -21,17 +32,19 @@ namespace PurgeDemoCommands.Specs
             string directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Environment.CurrentDirectory = directoryName;
 
-            
-            _testDataPath = Path.Combine(directoryName, "TestData_"+ ScenarioContext.Current.ScenarioInfo.Title.Replace(" ", "_"));
-            if (Directory.Exists(_testDataPath))
-                Directory.Delete(_testDataPath, true);
-            FileHelper.DirectoryCopy(Path.Combine(directoryName, "TestData_Init"), _testDataPath, true);
+            string testDataPath = Path.Combine(directoryName, "TestData_"+ ScenarioContext.Current.ScenarioInfo.Title.Replace(" ", "_").Replace("'", ""));
+            TestDataPath = testDataPath;
+            if (Directory.Exists(testDataPath))
+                Directory.Delete(testDataPath, true);
+            FileHelper.DirectoryCopy(Path.Combine(directoryName, "TestData_Init"), testDataPath, true);
         }
 
         [Given(@"the arguments \[(.*)]")]
         public void GivenTheArguments(string arguments)
         {
-            arguments = arguments.Replace("TestData", _testDataPath);
+            arguments = ReplaceTestDataPath(arguments);
+            Console.WriteLine("arguments: " + arguments);
+
             Arguments = arguments;
         }
 
@@ -54,10 +67,16 @@ namespace PurgeDemoCommands.Specs
             foreach (string[] row in table.AllRows())
             {
                 string path = row[0];
-                path = path.Replace("TestData", _testDataPath);
-                
+                path = ReplaceTestDataPath(path);
+
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(File.Exists(path), "File.Exists({0})", path);
             }
+        }
+
+        private static string ReplaceTestDataPath(string arguments)
+        {
+            arguments = arguments.Replace("TestData", TestDataPath);
+            return arguments;
         }
     }
 
