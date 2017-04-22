@@ -29,7 +29,7 @@ Scenario: purge folder '_'
 
 Scenario: purge folder '1'
 	Given the arguments [TestData\1]
-	And the timeout 20000
+	And the timeout 30000
 	When I run PurgeDemoComands
 	Then I expect files
 	 | TestData\1\purged\0-Me-Intro.dem |

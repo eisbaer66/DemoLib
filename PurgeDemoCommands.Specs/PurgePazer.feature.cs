@@ -155,7 +155,7 @@ this.ScenarioSetup(scenarioInfo);
 #line 31
  testRunner.Given("the arguments [TestData\\1]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 32
- testRunner.And("the timeout 20000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the timeout 30000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 33
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
