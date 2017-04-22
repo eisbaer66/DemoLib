@@ -119,6 +119,8 @@ namespace PurgeDemoCommands.DemoLib
                 }
 
                 Log.DebugFormat("writing purged content to {NewFilename}", result.NewFilepath);
+                string newDirectoryName = Path.GetDirectoryName(result.NewFilepath);
+                Directory.CreateDirectory(newDirectoryName);
                 File.Copy(tempFilename, result.NewFilepath, true);
             }
             return result;
