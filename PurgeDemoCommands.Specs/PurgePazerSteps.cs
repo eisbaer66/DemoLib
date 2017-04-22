@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace PurgeDemoCommands.Specs
@@ -25,7 +22,7 @@ namespace PurgeDemoCommands.Specs
             Environment.CurrentDirectory = directoryName;
 
             
-            _testDataPath = Path.Combine(directoryName, "TestData_"+ TestContext.CurrentContext.Test.Name);
+            _testDataPath = Path.Combine(directoryName, "TestData_"+ ScenarioContext.Current.ScenarioInfo.Title.Replace(" ", "_"));
             if (Directory.Exists(_testDataPath))
                 Directory.Delete(_testDataPath, true);
             FileHelper.DirectoryCopy(Path.Combine(directoryName, "TestData_Init"), _testDataPath, true);
@@ -58,7 +55,8 @@ namespace PurgeDemoCommands.Specs
             {
                 string path = row[0];
                 path = path.Replace("TestData", _testDataPath);
-                Assert.That(File.Exists(path), "File.Exists({0})", path);
+                
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(File.Exists(path), "File.Exists({0})", path);
             }
         }
     }
