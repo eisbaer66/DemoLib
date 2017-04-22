@@ -3,8 +3,6 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DemoLib;
 using DemoLib.Commands;
@@ -132,61 +130,54 @@ namespace PurgeDemoCommands.DemoLib
 
         private async Task ReplaceCommandsIn(DemoReader demo, string filename)
         {
-            var commands = ExtractCommands(demo);
-            Log.DebugFormat("replacing {CommandCount} commands using {TempFilename}", commands.Length, filename);
+            var indices = ExtractIndices(demo);
+            Log.DebugFormat("replacing {CommandCount} commands using {TempFilename}", indices.Length, filename);
 
-            Regex regex = CreateRegex(commands);
-            var matches = Match(filename, regex);
-            Log.DebugFormat("found {CountOccurrences} occurrences", matches.Length);
-
-            await ReplaceMatches(filename, matches);
-            Log.DebugFormat("{CountOccurrences} occurrences in {TempFilename} replaces", matches.Length, filename);
+            await OverrideCommands(filename, indices);
+            Log.DebugFormat("{CountOccurrences} occurrences in {TempFilename} replaces", indices.Length, filename);
         }
 
-        private static async Task ReplaceMatches(string filename, IEnumerable<Group> matches)
+        private static async Task OverrideCommands(string filename, Tuple<long, long>[] indices)
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite))
             {
-                foreach (Group match in matches)
+                foreach (Tuple<long, long> index in indices)
                 {
-                    long bytesToMove = match.Index - stream.Position;
+                    long indexStart = index.Item1 + 4;
+                    long indexEnd = index.Item2;
+
+                    long bytesToMove = indexStart - stream.Position;
                     if (bytesToMove < 0)
                         throw new ApplicationException("unexpected index while replacing commands");
 
                     stream.Seek(bytesToMove, SeekOrigin.Current);
-                    byte[] array = Enumerable.Range(1, match.Length).Select(i => (byte) 0).ToArray();
-                    await stream.WriteAsync(array, 0, match.Length);
+                    long length = indexEnd - indexStart;
+                    
+                    while (length > 0)
+                    {
+                        int l = length > int.MaxValue ? int.MaxValue : (int) length;
+                        byte[] array = new byte[l];
+                        for (int i = 0; i < l; i++)
+                        {
+                            array[i] = 0;
+                        }
+
+                        await stream.WriteAsync(array, 0, l);
+
+                        length -= l;
+                    }
                 }
             }
         }
 
-        private static Group[] Match(string filename, Regex regex)
+        private static Tuple<long, long>[] ExtractIndices(DemoReader demo)
         {
-            string content = File.ReadAllText(filename, Encoding.ASCII);
-            return regex.Matches(content)
-                .Cast<Match>()
-                .SelectMany(m => m.Groups.Cast<Group>().Skip(1).Where(g => g.Success))
-                .OrderBy(m => m.Index)
-                .ToArray();
-        }
-
-        private static Regex CreateRegex(string[] commands)
-        {
-            //  x04[\s\S]{8}(COMMAND)x00   starts with "a byte (value 4)" followed by "8 bytes (length of string)" followed by "the command" followed by "a byte (value 0)"
-            string startToken = ((char) 4).ToString();
-            IEnumerable<string> regexParts = commands.Select(
-                s => string.Format(@"{0}[\s\S]{{8}}({1})", Regex.Escape(startToken), Regex.Escape(s + "\0")));
-            return new Regex(string.Join("|", regexParts));
-        }
-
-        private string[] ExtractCommands(DemoReader demo)
-        {
-            return demo.Commands
+            var indices = demo.Commands
                 .OfType<DemoConsoleCommand>()
-                .Select(c => c.Command)
-                .Distinct()
-                .Where(Filter.Match)
+                .Select(c => new Tuple<long, long>(c.IndexStart, c.IndexEnd))
+                .OrderBy(t => t.Item1)
                 .ToArray();
+            return indices;
         }
 
         private static DemoReader ParseDemo(string filename)
