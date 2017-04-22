@@ -74,6 +74,7 @@
     <Compile Include="Extensions\BitStreamExtensions.cs" />
     <Compile Include="NetMessages\DebugMessage.cs" />
     <Compile Include="NetMessages\NetCrosshairangleMessage.cs" />
+    <Compile Include="NetMessages\NetGetCVarValueMessage.cs" />
     <Compile Include="NetMessages\Shared\EntityCoder.cs" />
     <Compile Include="NetMessages\SomeBitMessage.cs" />
     <Compile Include="SingleEvent.cs" />

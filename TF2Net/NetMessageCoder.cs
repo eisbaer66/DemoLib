@@ -65,6 +65,7 @@ namespace TF2Net
 				case NetMessageType.SVC_PREFETCH:			return new NetPrefetchMessage();
 
 				case NetMessageType.SVC_GAMEEVENTLIST:		return new NetGameEventListMessage();
+				case NetMessageType.SVC_GETCVARVALUE:		return new NetGetCVarValueMessage();
 
 #if DEBUG
 			    default: return new DebugMessage { Type = type };
