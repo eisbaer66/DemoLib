@@ -81,7 +81,7 @@ this.ScenarioSetup(scenarioInfo);
 #line 8
  testRunner.Given("the arguments [TestData\\_\\0-Me-Intro.dem]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 9
- testRunner.And("the timeout 1000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the timeout 2000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 10
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
@@ -105,7 +105,7 @@ this.ScenarioSetup(scenarioInfo);
  testRunner.Given("the arguments [TestData\\_\\0-Me-Intro.dem TestData\\_\\19-Me-Using-Other-Spies-As-De" +
                     "coy.dem]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 16
- testRunner.And("the timeout 2000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the timeout 4000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 17
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
@@ -216,7 +216,7 @@ this.ScenarioSetup(scenarioInfo);
 #line 57
  testRunner.Given("the arguments [TestData\\2]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line 58
- testRunner.And("the timeout 7000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("the timeout 14000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 59
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden

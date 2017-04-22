@@ -6,14 +6,14 @@
 @mytag
 Scenario: purge single demo
 	Given the arguments [TestData\_\0-Me-Intro.dem]
-	And the timeout 1000
+	And the timeout 2000
 	When I run PurgeDemoComands
 	Then I expect files
 	 | TestData\_\purged\0-Me-Intro.dem |
 
 Scenario: purge multiple demos
 	Given the arguments [TestData\_\0-Me-Intro.dem TestData\_\19-Me-Using-Other-Spies-As-Decoy.dem]
-	And the timeout 2000
+	And the timeout 4000
 	When I run PurgeDemoComands
 	Then I expect files
 	 | TestData\_\purged\0-Me-Intro.dem |
@@ -55,7 +55,7 @@ Scenario: purge folder '1'
 
 Scenario: purge folder '2'
 	Given the arguments [TestData\2]
-	And the timeout 7000
+	And the timeout 14000
 	When I run PurgeDemoComands
 	Then I expect files
 	 | TestData\2\purged\bodyblock.dem |
