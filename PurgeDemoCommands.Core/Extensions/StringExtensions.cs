@@ -1,4 +1,4 @@
-namespace PurgeDemoCommands.Extensions
+namespace PurgeDemoCommands.Core.Extensions
 {
     public static class StringExtensions
     {

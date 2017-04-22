@@ -1,9 +1,9 @@
 using System;
 
-namespace PurgeDemoCommands
+namespace PurgeDemoCommands.Core
 {
     [Flags]
-    internal enum Warning
+    public enum Warning
     {
         None = 0,
         FileAlreadyExists = 1,

@@ -11,6 +11,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B2593870
 		util\PushTo-GitHub.ps1 = util\PushTo-GitHub.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TF2Net", "TF2Net\TF2Net.csproj", "{2C2AF7CC-4368-4C03-B7E1-356D3BB89F4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitSet", "BitSet\BitSet.csproj", "{8F8A6380-5B10-4891-AC21-3D03494B3E44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoLib", "DemoLib\DemoLib.csproj", "{95495901-1A5C-47A2-BB54-8F7EE9004A77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.DemoLib", "PurgeDemoCommands.DemoLib\PurgeDemoCommands.DemoLib.csproj", "{6D8FC0C5-3087-427C-8EEF-4B86D8AD5215}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.Core", "PurgeDemoCommands.Core\PurgeDemoCommands.Core.csproj", "{9B444650-558C-4F95-B254-65EBD13EB3C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.AhoCorasick", "PurgeDemoCommands.AhoCorasick\PurgeDemoCommands.AhoCorasick.csproj", "{8A61F6D2-983E-4D64-9D09-712A0353723E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +33,30 @@ Global
 		{D652FE6B-7802-4A18-96AE-9D68E50929E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D652FE6B-7802-4A18-96AE-9D68E50929E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D652FE6B-7802-4A18-96AE-9D68E50929E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C2AF7CC-4368-4C03-B7E1-356D3BB89F4F}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{2C2AF7CC-4368-4C03-B7E1-356D3BB89F4F}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{2C2AF7CC-4368-4C03-B7E1-356D3BB89F4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C2AF7CC-4368-4C03-B7E1-356D3BB89F4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F8A6380-5B10-4891-AC21-3D03494B3E44}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{8F8A6380-5B10-4891-AC21-3D03494B3E44}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{8F8A6380-5B10-4891-AC21-3D03494B3E44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F8A6380-5B10-4891-AC21-3D03494B3E44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95495901-1A5C-47A2-BB54-8F7EE9004A77}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{95495901-1A5C-47A2-BB54-8F7EE9004A77}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{95495901-1A5C-47A2-BB54-8F7EE9004A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95495901-1A5C-47A2-BB54-8F7EE9004A77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D8FC0C5-3087-427C-8EEF-4B86D8AD5215}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D8FC0C5-3087-427C-8EEF-4B86D8AD5215}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D8FC0C5-3087-427C-8EEF-4B86D8AD5215}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D8FC0C5-3087-427C-8EEF-4B86D8AD5215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

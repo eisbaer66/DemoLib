@@ -5,22 +5,28 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using Ganss.Text;
 using MoreLinq;
-using Serilog;
+using PurgeDemoCommands.AhoCorasick.Logging;
+using PurgeDemoCommands.Core;
 
-namespace PurgeDemoCommands
+namespace PurgeDemoCommands.AhoCorasick
 {
     /// <summary>
     /// replaces all commands found by DemoReader in the specified files
     /// preserves all bytes, but the commands get replaced with \0's
     /// </summary>
-    internal class Command
+    internal class AhoCorasickCommand : IPurgeCommand
     {
-        private static readonly ILogger Log = Serilog.Log.Logger.ForContext<Command>();
-        private AhoCorasick _ahoCorasick;
+        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+        private Ganss.Text.AhoCorasick _ahoCorasick;
         private int _commandCount;
+        private readonly IThrottler _throttle;
+
+        public AhoCorasickCommand(IThrottler throttle)
+        {
+            _throttle = throttle;
+        }
 
         public IList<string> Filenames { get; set; }
         public string NewFilePattern { get; set; }
@@ -31,7 +37,7 @@ namespace PurgeDemoCommands
         {
             _commandCount = value.Length;
 
-            _ahoCorasick = new AhoCorasick(value);
+            _ahoCorasick = new Ganss.Text.AhoCorasick(value);
         }
 
         public async Task<IEnumerable<Result>> ExecuteThrottled()
@@ -39,24 +45,8 @@ namespace PurgeDemoCommands
             Result result = GuardArguments();
             if (result != null)
                 return new[] { result };
-
-            TransformBlock<string, Result> purges = new TransformBlock<string, Result>(file => Purge(file), new ExecutionDataflowBlockOptions {MaxDegreeOfParallelism = Environment.ProcessorCount });
-            BufferBlock<Result> buffer = new BufferBlock<Result>();
-            purges.LinkTo(buffer);
-
-            foreach (string filename in Filenames)
-            {
-                purges.Post(filename);
-            }
-
-            purges.Complete();
-            await purges.Completion;
-
-            IList<Result> results;
-            if (buffer.TryReceiveAll(out results))
-                return results;
-
-            throw new ExecuteException();
+            
+            return await _throttle.Throttle(Purge, Filenames);
         }
 
         public IEnumerable<Task<Result>> Execute()
@@ -84,13 +74,13 @@ namespace PurgeDemoCommands
         {
             try
             {
-                Log.Information("purging {Filename}", filename);
+                Log.InfoFormat("purging {Filename}", filename);
 
                 return await ReplaceCommandsWithTempFile(filename);
             }
             catch (Exception e)
             {
-                Log.Error(e, "error while purging {Filename}", filename);
+                Log.ErrorException("error while purging {Filename}", e, filename);
                 return new Result(filename)
                 {
                     ErrorText = e.Message,
@@ -128,13 +118,13 @@ namespace PurgeDemoCommands
 
                 if (overwriting)
                 {
-                    Log.Debug("deleting {NewFilename} to overwrite", result.NewFilepath);
+                    Log.DebugFormat("deleting {NewFilename} to overwrite", result.NewFilepath);
                     File.Delete(result.NewFilepath);
                 }
 
                 Directory.CreateDirectory(newDirectoryName);
 
-                Log.Debug("writing purged content to {NewFilename}", result.NewFilepath);
+                Log.DebugFormat("writing purged content to {NewFilename}", result.NewFilepath);
                 File.Copy(tempFilename, result.NewFilepath, true);
             }
             return result;
@@ -142,14 +132,14 @@ namespace PurgeDemoCommands
 
         private async Task ReplaceCommandsIn(string filename)
         {
-            Log.Debug("replacing {CommandCount} commands using {TempFilename}", _commandCount, filename);
+            Log.DebugFormat("replacing {CommandCount} commands using {TempFilename}", _commandCount, filename);
             
             string content = File.ReadAllText(filename, Encoding.ASCII);
             var matches = Match(content).ToArray();
-            Log.Debug("found {CountOccurrences} occurrences", matches.Length);
+            Log.DebugFormat("found {CountOccurrences} occurrences", matches.Length);
 
             await ReplaceMatches(filename, matches);
-            Log.Debug("{CountOccurrences} occurrences in {TempFilename} replaces", matches.Length, filename);
+            Log.DebugFormat("{CountOccurrences} occurrences in {TempFilename} replaces", matches.Length, filename);
         }
 
         private static async Task ReplaceMatches(string filename, IEnumerable<WordMatch> matches)
@@ -171,7 +161,7 @@ namespace PurgeDemoCommands
                     if (bytesTillNull < 0)
                         continue;
 
-                    Log.Verbose("replacing {ReplacesByteCount} Bytes for command {ReplacedCommand} at index {ReplacedIndex}", bytesTillNull, match.Word, match.Index);
+                    Log.TraceFormat("replacing {ReplacesByteCount} Bytes for command {ReplacedCommand} at index {ReplacedIndex}", bytesTillNull, match.Word, match.Index);
                     await WriteNulls(stream, bytesTillNull);
                 }
             }

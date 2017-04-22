@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PurgeDemoCommands.Extensions
+namespace PurgeDemoCommands.Core.Extensions
 {
     public static class EnumerableExtension
     {

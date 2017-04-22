@@ -1,6 +1,6 @@
 using System;
 
-namespace PurgeDemoCommands
+namespace PurgeDemoCommands.Core
 {
     internal class ExecuteException : Exception
     {

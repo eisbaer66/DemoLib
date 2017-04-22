@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using CommandLine;
 using Nito.AsyncEx;
+using PurgeDemoCommands.Core;
+using PurgeDemoCommands.DemoLib;
 using Serilog;
 using Serilog.Formatting.Json;
+using IPurgeCommand = PurgeDemoCommands.Core.IPurgeCommand;
+using Result = PurgeDemoCommands.Core.Result;
 
 namespace PurgeDemoCommands
 {
@@ -46,7 +49,7 @@ namespace PurgeDemoCommands
                 await updateComandListComand.Execute();
             }
 
-            Command command = SetupCommand(options);
+            IPurgeCommand command = SetupCommand(options);
             IEnumerable<Result> results = await command.ExecuteThrottled();
             LogResults(results.ToArray(), options);
         }
@@ -88,12 +91,12 @@ namespace PurgeDemoCommands
             }
         }
 
-        private static Command SetupCommand(Options options)
+        private static IPurgeCommand SetupCommand(Options options)
         {
             string[] whitelist = GetCommandsFromFile(options.WhitelistPath);
             string[] blacklist = GetCommandsFromFile(options.BlacklistPath);
             string[] commands = GetCommandsFromFile(options.CommandList);
-            Command command = new Command
+            PazerCommand command = new PazerCommand(new CommandHelper())
             {
                 Filenames = GetFiles(options),
                 NewFilePattern = options.NewFilePattern,

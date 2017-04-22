@@ -1,8 +1,8 @@
 using System;
 
-namespace PurgeDemoCommands
+namespace PurgeDemoCommands.Core
 {
-    internal class PurgeException : Exception
+    public class PurgeException : Exception
     {
         public string Filename { get; }
 

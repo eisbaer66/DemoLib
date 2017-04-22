@@ -1,8 +1,8 @@
 using System;
 
-namespace PurgeDemoCommands
+namespace PurgeDemoCommands.Core
 {
-    internal class Result
+    public class Result
     {
         public string Filename { get; }
         public Warning Warning { get; set; }

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using PurgeDemoCommands.Extensions;
-using Serilog;
+using PurgeDemoCommands.Core.Extensions;
+using PurgeDemoCommands.Core.Logging;
 
-namespace PurgeDemoCommands
+namespace PurgeDemoCommands.Core
 {
     public interface IFilter
     {
@@ -12,23 +12,23 @@ namespace PurgeDemoCommands
 
     public static class Filter
     {
-        private static readonly ILogger Logger = Log.Logger;
+        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         public static IFilter From(ICollection<string> whitelist, ICollection<string> blacklist)
         {
             if (whitelist != null)
             {
-                Logger.Information("using whitelist with {WhitelistCount} commands", whitelist.Count);
+                Logger.InfoFormat("using whitelist with {WhitelistCount} commands", whitelist.Count);
 
                 return new Whitelist(whitelist);
             }
             if (blacklist != null)
             {
-                Logger.Information("using blacklist with {BlacklistCount} commands", blacklist.Count);
+                Logger.InfoFormat("using blacklist with {BlacklistCount} commands", blacklist.Count);
 
                 return new Blacklist(blacklist);
             }
 
-            Logger.Information("using no filter, purging all commands");
+            Logger.InfoFormat("using no filter, purging all commands");
             return new PassThrough();
         }
 
