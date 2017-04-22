@@ -11,7 +11,7 @@ namespace TF2Net.NetMessages
     {
         const byte MaxDecalIndexBits = 9;
         const byte MaxEdictBits = 11;
-        const byte SpModelIndexBits = 11;
+        const byte SpModelIndexBits = 13;
 
         public string Description => string.Format("svc_bspdecal: {0} {1} {2}", Position, DecalTextureIndex, EntIndex);
         public Vector Position { get; set; }
