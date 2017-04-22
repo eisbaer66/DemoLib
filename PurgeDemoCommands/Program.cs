@@ -102,6 +102,7 @@ namespace PurgeDemoCommands
                 NewFilePattern = options.NewFilePattern,
                 Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
+                SkipTest = options.SkipTest,
             };
             command.SetCommands(commands);
 
