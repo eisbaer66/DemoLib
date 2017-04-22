@@ -34,8 +34,5 @@
 		SVC_MENU = 29,
 		SVC_GAMEEVENTLIST = 30,
 		SVC_GETCVARVALUE = 31,
-	    // 32
-	    // 33
-	    SVC_UNKNKOWN_34 = 34,
     }
 }

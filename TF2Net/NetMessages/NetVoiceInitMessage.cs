@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using BitSet;
 using TF2Net.Data;
 
@@ -15,22 +10,18 @@ namespace TF2Net.NetMessages
 		public string VoiceCodec { get; set; }
 		public byte Quality { get; set; }
 
-		public string Description
-		{
-			get
-			{
-				return string.Format("svc_VoiceInit: codec \"{0}\", qualitty {1}",
-					VoiceCodec, Quality);
-			}
-		}
+		public string Description => string.Format("svc_VoiceInit: codec \"{0}\", quality {1} samplerate {2}", VoiceCodec, Quality, SampleRate);
 
-		public void ReadMsg(BitStream stream)
+	    public void ReadMsg(BitStream stream)
 		{
 			VoiceCodec = stream.ReadCString();
 			Quality = stream.ReadByte();
-		}
+		    SampleRate = stream.ReadUInt(16);
+        }
 
-		public void ApplyWorldState(WorldState ws)
+	    public uint SampleRate { get; set; }
+
+        public void ApplyWorldState(WorldState ws)
 		{
 			//throw new NotImplementedException();
 		}
