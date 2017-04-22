@@ -79,7 +79,11 @@ namespace PurgeDemoCommands.DemoLib
             }
             catch (Exception e)
             {
-                throw new PurgeException(filename, e);
+                Log.ErrorException("error while purging {Filename}", e, filename);
+                return new Result(filename)
+                {
+                    ErrorText = e.Message,
+                };
             }
         }
 
