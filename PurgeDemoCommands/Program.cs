@@ -39,7 +39,7 @@ namespace PurgeDemoCommands
 
         private static async void MainAsync(Options options)
         {
-            if (options.UpdateComandList || !File.Exists(options.CommandList))
+            if (options.UpdateComandList || !string.IsNullOrEmpty(options.CommandList) && !File.Exists(options.CommandList))
             {
                 UpdateComandListComand updateComandListComand = new UpdateComandListComand
                 {
