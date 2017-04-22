@@ -77,6 +77,7 @@
     <Compile Include="NetMessages\NetGetCVarValueMessage.cs" />
     <Compile Include="NetMessages\Shared\EntityCoder.cs" />
     <Compile Include="NetMessages\SomeBitMessage.cs" />
+    <Compile Include="NetMessages\NetTerrainModMessage.cs" />
     <Compile Include="SingleEvent.cs" />
     <Compile Include="Data\BaselineIndex.cs" />
     <Compile Include="Data\Class.cs" />

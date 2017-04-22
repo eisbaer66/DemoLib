@@ -55,7 +55,7 @@ namespace TF2Net
 				case NetMessageType.SVC_FIXANGLE:			return new NetFixAngleMessage();
 			    case NetMessageType.SVC_CROSSHAIRANGLE:     return new NetCrosshairangleMessage();
                 case NetMessageType.SVC_BSPDECAL:           return new NetBspDecalMessage();
-
+                case NetMessageType.SVC_TERRAIN_MOD:        return new NetTerrainModMessage();
                 case NetMessageType.SVC_USERMESSAGE:		return new NetUsrMsgMessage();
 
 				case NetMessageType.SVC_ENTITYMESSAGE:		return new NetEntityMessage();
