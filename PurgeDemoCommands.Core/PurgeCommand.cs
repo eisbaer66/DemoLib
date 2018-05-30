@@ -1,32 +1,34 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using DemoLib;
-using DemoLib.Commands;
-using PurgeDemoCommands.Core;
-using PurgeDemoCommands.DemoLib.Logging;
+using PurgeDemoCommands.Core.Logging;
 
-namespace PurgeDemoCommands.DemoLib
+namespace PurgeDemoCommands.Core
 {
     /// <summary>
     /// replaces all commands found by DemoReader in the specified files
     /// preserves all bytes, but the commands get replaced with \0's
     /// </summary>
-    public class PazerCommand : IPurgeCommand
+    public class PurgeCommand : IPurgeCommand
     {
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
         private readonly IThrottler _throttle;
 
         public IList<string> Filenames { get; set; }
         public string NewFilePattern { get; set; }
-        public bool SkipTest { get; set; }
         public bool Overwrite { get; set; }
         public IFilter Filter { get; set; }
+        public IParser Parser { get; set; }
+        public IInjectionCommandCollection StartInjection { get; set; }
+        public IEnumerable<ITest> Tests { get; set; }
 
-        public PazerCommand(IThrottler throttle)
+
+        public PurgeCommand(IThrottler throttle)
         {
             _throttle = throttle;
         }
@@ -71,7 +73,8 @@ namespace PurgeDemoCommands.DemoLib
             {
                 Log.InfoFormat("purging {Filename}", filename);
 
-                DemoReader demo = ParseDemo(filename);
+                IList<CommandPosition> demo = await Parser.ReadDemo(filename);
+                Log.InfoFormat("found {CommandPositionCount} commands in {Filename}", demo.Count, filename);
 
                 return await ReplaceCommandsWithTempFile(filename, demo);
             }
@@ -85,10 +88,10 @@ namespace PurgeDemoCommands.DemoLib
             }
         }
 
-        private async Task<Result> ReplaceCommandsWithTempFile(string filename, DemoReader demo)
+        private async Task<Result> ReplaceCommandsWithTempFile(string filename, IList<CommandPosition> positions)
         {
             Result result = new Result(filename);
-            
+
             string newFilename = string.Format(NewFilePattern, Path.GetFileNameWithoutExtension(filename));
             result.NewFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
 
@@ -110,10 +113,12 @@ namespace PurgeDemoCommands.DemoLib
                 File.Copy(filename, tempFilename);
 
 
-                await ReplaceCommandsIn(demo, tempFilename);
-                if (!SkipTest)
-                    EnsureDemoIsReadable(tempFilename);
-                
+                await ReplaceMatches(tempFilename, positions);
+                foreach (ITest test in Tests)
+                {
+                    test.Run(tempFilename);
+                }
+
                 if (overwriting)
                 {
                     Log.DebugFormat("deleting {NewFilename} to overwrite", result.NewFilepath);
@@ -128,80 +133,59 @@ namespace PurgeDemoCommands.DemoLib
             return result;
         }
 
-        private async Task ReplaceCommandsIn(DemoReader demo, string filename)
-        {
-            var indices = ExtractIndices(demo);
-            Log.DebugFormat("replacing {CommandCount} commands using {TempFilename}", indices.Length, filename);
-
-            await OverrideCommands(filename, indices);
-            Log.DebugFormat("{CountOccurrences} occurrences in {TempFilename} replaces", indices.Length, filename);
-        }
-
-        private static async Task OverrideCommands(string filename, Tuple<long, long>[] indices)
+        private async Task ReplaceMatches(string filename, IEnumerable<CommandPosition> positions)
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite))
             {
-                foreach (Tuple<long, long> index in indices)
+                foreach (CommandPosition position in positions)
                 {
-                    long indexStart = index.Item1 + 4;
-                    long indexEnd = index.Item2;
+                    MoveToPosition(stream, position.Index);
 
-                    long bytesToMove = indexStart - stream.Position;
-                    if (bytesToMove < 0)
-                        throw new ApplicationException("unexpected index while replacing commands");
+                    string command = StartInjection.GetCommand(position.NumberOfBytes);
 
-                    stream.Seek(bytesToMove, SeekOrigin.Current);
-                    long length = indexEnd - indexStart;
-                    
-                    while (length > 0)
+                    if (string.IsNullOrEmpty(command))
                     {
-                        int l = length > int.MaxValue ? int.MaxValue : (int) length;
-                        byte[] array = new byte[l];
-                        for (int i = 0; i < l; i++)
-                        {
-                            array[i] = 0;
-                        }
-
-                        await stream.WriteAsync(array, 0, l);
-
-                        length -= l;
+                        Log.TraceFormat("replacing {CommandPosition} with null-bytes", position);
+                        await WriteNulls(stream, position.NumberOfBytes);
                     }
+                    else
+                    {
+                        Log.TraceFormat("replacing {CommandPosition} with {InjectedCommand}", position, command);
+                        await Write(stream, command, position.NumberOfBytes);
+                    }
+
                 }
             }
         }
 
-        private static Tuple<long, long>[] ExtractIndices(DemoReader demo)
+        private static void MoveToTextStart(FileStream stream)
         {
-            var indices = demo.Commands
-                .OfType<DemoConsoleCommand>()
-                .Select(c => new Tuple<long, long>(c.IndexStart, c.IndexEnd))
-                .OrderBy(t => t.Item1)
-                .ToArray();
-            return indices;
-        }
-
-        private static DemoReader ParseDemo(string filename)
-        {
-            Log.DebugFormat("reading demo from {Filename}", filename);
-
-            return Parse(filename);
-        }
-
-        private void EnsureDemoIsReadable(string filename)
-        {
-            Log.DebugFormat("testing demo {Filename}", filename);
-
-            Parse(filename);
-
-            Log.DebugFormat("test successfull for demo {Filename}", filename);
-        }
-
-        private static DemoReader Parse(string filename)
-        {
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read))
+            stream.Seek(-1, SeekOrigin.Current);
+            while (char.IsWhiteSpace((char)stream.ReadByte()))
             {
-                return DemoReader.FromStream(stream);
+                stream.Seek(-2, SeekOrigin.Current);
             }
+        }
+
+        private static void MoveToPosition(FileStream stream, long index)
+        {
+            long bytesToMove = index - stream.Position;
+            stream.Seek(bytesToMove, SeekOrigin.Current);
+        }
+
+        private static async Task WriteNulls(FileStream stream, long bytesTillNull)
+        {
+            byte[] array = Enumerable.Range(1, (int)bytesTillNull).Select(i => (byte)0).ToArray();
+            await stream.WriteAsync(array, 0, array.Length);
+        }
+
+        private static async Task Write(FileStream stream, string command, long numberOfBytes)
+        {
+            byte[] array = Encoding.ASCII.GetBytes(command);
+            Debug.Assert(array.Length <= numberOfBytes);
+
+            await stream.WriteAsync(array, 0, array.Length);
+            await WriteNulls(stream, numberOfBytes - array.Length);
         }
     }
 }

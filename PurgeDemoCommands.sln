@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands", "PurgeDemoCommands\PurgeDemoCommands.csproj", "{D652FE6B-7802-4A18-96AE-9D68E50929E3}"
 EndProject
@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		test.runsettings = test.runsettings
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.CompareTests", "PurgeDemoCommands.CompareTests\PurgeDemoCommands.CompareTests.csproj", "{A373FD9B-AC80-49FC-9B60-EA4965C19062}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,8 +71,15 @@ Global
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BD5B60E-BEA7-4656-B333-B5B65BEFDA82}
 	EndGlobalSection
 EndGlobal

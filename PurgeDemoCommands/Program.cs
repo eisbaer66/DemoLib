@@ -39,16 +39,6 @@ namespace PurgeDemoCommands
 
         private static async void MainAsync(Options options)
         {
-            if (options.UpdateComandList || !string.IsNullOrEmpty(options.CommandList) && !File.Exists(options.CommandList))
-            {
-                UpdateComandListComand updateComandListComand = new UpdateComandListComand
-                {
-                    Path = options.CommandList,
-                };
-
-                await updateComandListComand.Execute();
-            }
-
             IPurgeCommand command = SetupCommand(options);
             IEnumerable<Result> results = await command.ExecuteThrottled();
             LogResults(results.ToArray(), options);
@@ -95,17 +85,21 @@ namespace PurgeDemoCommands
         {
             string[] whitelist = GetCommandsFromFile(options.WhitelistPath);
             string[] blacklist = GetCommandsFromFile(options.BlacklistPath);
-            string[] commands = GetCommandsFromFile(options.CommandList);
-            PazerCommand command = new PazerCommand(new CommandHelper())
+
+            Queue<string> queue = new Queue<string>();
+            queue.Enqueue("demo_gototick 5000");
+            IList<ITest> tests = GetTests(options.SkipTest);
+
+            PurgeCommand command = new PurgeCommand(new CommandHelper())
             {
+                Parser = new PazerParser(),
                 Filenames = GetFiles(options),
                 NewFilePattern = options.NewFilePattern,
                 Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
-                SkipTest = options.SkipTest,
+                StartInjection = new InjectionCommandCollection(new Queue<Queue<string>>(new []{ queue })),
+                Tests = tests,
             };
-            command.SetCommands(commands);
-
             return command;
         }
 
@@ -127,6 +121,13 @@ namespace PurgeDemoCommands
                 return new string[0];
 
             return File.ReadAllLines(path);
+        }
+
+        private static IList<ITest> GetTests(bool skipTest)
+        {
+            if (skipTest)
+                return new List<ITest>();
+            return new List<ITest> { new IsParsableByPazer() };
         }
 
         private static Options ParseOptions(string[] args)
