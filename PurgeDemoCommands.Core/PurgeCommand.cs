@@ -17,83 +17,55 @@ namespace PurgeDemoCommands.Core
     public class PurgeCommand : IPurgeCommand
     {
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
-        private readonly IThrottler _throttle;
 
-        public IList<string> Filenames { get; set; }
+        public string FileName { get; set; }
         public string NewFilePattern { get; set; }
         public bool Overwrite { get; set; }
-        public IFilter Filter { get; set; }
         public IParser Parser { get; set; }
-        public IInjectionCommandCollection StartInjection { get; set; }
+        public ICommandInjection CommandInjection { get; set; }
         public IEnumerable<ITest> Tests { get; set; }
 
-
-        public PurgeCommand(IThrottler throttle)
-        {
-            _throttle = throttle;
-        }
-
-        public void SetCommands(string[] value)
-        {
-        }
-
-        public async Task<IEnumerable<Result>> ExecuteThrottled()
-        {
-            Result result = GuardArguments();
-            if (result != null)
-                return new[] { result };
-
-            return await _throttle.Throttle(Purge, Filenames);
-        }
-
-        public IEnumerable<Task<Result>> Execute()
-        {
-            Result result = GuardArguments();
-            if (result != null)
-                return new[] { Task.FromResult(result) };
-
-            return Filenames.Select(Purge);
-        }
-
-        private Result GuardArguments()
-        {
-            if (Filenames == null)
-                return new Result("unknown") { ErrorText = "no files specified" };
-            if (NewFilePattern == null)
-                return new Result("unknown") { ErrorText = "no filepattern for new files specified" };
-            if (Filenames.Count == 0)
-                return new Result("unknown") { ErrorText = "no files specified" };
-
-            return null;
-        }
-
-        private async Task<Result> Purge(string filename)
+        public async Task<Result> Purge()
         {
             try
             {
-                Log.InfoFormat("purging {Filename}", filename);
+                Log.InfoFormat("purging {Filename}", FileName);
 
-                IList<CommandPosition> demo = await Parser.ReadDemo(filename);
-                Log.InfoFormat("found {CommandPositionCount} commands in {Filename}", demo.Count, filename);
-
-                return await ReplaceCommandsWithTempFile(filename, demo);
+                IList<CommandPosition> positions = await Parser.ReadDemo(FileName);
+                Log.InfoFormat("found {CommandPositionCount} commands in {Filename}", positions.Count, FileName);
+                IList<ReplacementPosition> replacments = PlanInjection(positions);
+                return await ReplaceCommandsWithTempFile(replacments);
             }
             catch (Exception e)
             {
-                Log.ErrorException("error while purging {Filename}", e, filename);
-                return new Result(filename)
+                Log.ErrorException("error while purging {Filename}", e, FileName);
+                return new Result(FileName)
                 {
                     ErrorText = e.Message,
                 };
             }
         }
 
-        private async Task<Result> ReplaceCommandsWithTempFile(string filename, IList<CommandPosition> positions)
+        private IList<ReplacementPosition> PlanInjection(IList<CommandPosition> positions)
         {
-            Result result = new Result(filename);
+            try
+            {
+                return CommandInjection.PlanReplacements(positions);
+            }
+            catch (Exception e)
+            {
+                Log.ErrorException("error while planing injection. using NullInjection", e);
 
-            string newFilename = string.Format(NewFilePattern, Path.GetFileNameWithoutExtension(filename));
-            result.NewFilepath = Path.Combine(Path.GetDirectoryName(filename), newFilename);
+                return new CommandInjection(new List<ITickInjection>()).PlanReplacements(positions);
+            }
+        }
+
+        private async Task<Result> ReplaceCommandsWithTempFile(IList<ReplacementPosition> positions)
+        {
+            Result result = new Result(FileName);
+
+            string newFilename = string.Format(NewFilePattern, Path.GetFileNameWithoutExtension(FileName));
+            result.NewFilepath = Path.Combine(Path.GetDirectoryName(FileName), newFilename);
 
             bool overwriting = false;
             if (File.Exists(result.NewFilepath))
@@ -110,7 +82,7 @@ namespace PurgeDemoCommands.Core
             using (TempFileCollection tempFileCollection = new TempFileCollection())
             {
                 string tempFilename = tempFileCollection.AddExtension("dem");
-                File.Copy(filename, tempFilename);
+                File.Copy(FileName, tempFilename);
 
 
                 await ReplaceMatches(tempFilename, positions);
@@ -133,37 +105,17 @@ namespace PurgeDemoCommands.Core
             return result;
         }
 
-        private async Task ReplaceMatches(string filename, IEnumerable<CommandPosition> positions)
+        private async Task ReplaceMatches(string filename, IEnumerable<ReplacementPosition> positions)
         {
             using (var stream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite))
             {
-                foreach (CommandPosition position in positions)
+                foreach (ReplacementPosition position in positions)
                 {
                     MoveToPosition(stream, position.Index);
 
-                    string command = StartInjection.GetCommand(position.NumberOfBytes);
-
-                    if (string.IsNullOrEmpty(command))
-                    {
-                        Log.TraceFormat("replacing {CommandPosition} with null-bytes", position);
-                        await WriteNulls(stream, position.NumberOfBytes);
-                    }
-                    else
-                    {
-                        Log.TraceFormat("replacing {CommandPosition} with {InjectedCommand}", position, command);
-                        await Write(stream, command, position.NumberOfBytes);
-                    }
-
+                    Log.TraceFormat("replacing {CommandPosition} with {InjectedCommand}", position.Index, Encoding.ASCII.GetString(position.Bytes));
+                    await Write(stream, position.Bytes);
                 }
-            }
-        }
-
-        private static void MoveToTextStart(FileStream stream)
-        {
-            stream.Seek(-1, SeekOrigin.Current);
-            while (char.IsWhiteSpace((char)stream.ReadByte()))
-            {
-                stream.Seek(-2, SeekOrigin.Current);
             }
         }
 
@@ -173,19 +125,9 @@ namespace PurgeDemoCommands.Core
             stream.Seek(bytesToMove, SeekOrigin.Current);
         }
 
-        private static async Task WriteNulls(FileStream stream, long bytesTillNull)
+        private async Task Write(FileStream stream, byte[] bytes)
         {
-            byte[] array = Enumerable.Range(1, (int)bytesTillNull).Select(i => (byte)0).ToArray();
-            await stream.WriteAsync(array, 0, array.Length);
-        }
-
-        private static async Task Write(FileStream stream, string command, long numberOfBytes)
-        {
-            byte[] array = Encoding.ASCII.GetBytes(command);
-            Debug.Assert(array.Length <= numberOfBytes);
-
-            await stream.WriteAsync(array, 0, array.Length);
-            await WriteNulls(stream, numberOfBytes - array.Length);
+            await stream.WriteAsync(bytes, 0, bytes.Length);
         }
     }
 }

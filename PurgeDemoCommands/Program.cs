@@ -6,9 +6,9 @@ using CommandLine;
 using Nito.AsyncEx;
 using PurgeDemoCommands.Core;
 using PurgeDemoCommands.DemoLib;
+using PurgeDemoCommands.Sprache;
 using Serilog;
 using Serilog.Formatting.Json;
-using IPurgeCommand = PurgeDemoCommands.Core.IPurgeCommand;
 using Result = PurgeDemoCommands.Core.Result;
 
 namespace PurgeDemoCommands
@@ -39,8 +39,8 @@ namespace PurgeDemoCommands
 
         private static async void MainAsync(Options options)
         {
-            IPurgeCommand command = SetupCommand(options);
-            IEnumerable<Result> results = await command.ExecuteThrottled();
+            IThrottledPurgeCommand command = SetupCommand(options);
+            IEnumerable<Result> results = await command.Execute();
             LogResults(results.ToArray(), options);
         }
 
@@ -81,25 +81,24 @@ namespace PurgeDemoCommands
             }
         }
 
-        private static IPurgeCommand SetupCommand(Options options)
+        private static IThrottledPurgeCommand SetupCommand(Options options)
         {
             string[] whitelist = GetCommandsFromFile(options.WhitelistPath);
             string[] blacklist = GetCommandsFromFile(options.BlacklistPath);
 
-            Queue<string> queue = new Queue<string>();
-            queue.Enqueue("demo_gototick 5000");
             IList<ITest> tests = GetTests(options.SkipTest);
 
-            PurgeCommand command = new PurgeCommand(new CommandHelper())
+            ThrottledFilesPurgeCommand command = new ThrottledFilesPurgeCommand(new CommandHelper())
             {
                 Parser = new PazerParser(),
                 Filenames = GetFiles(options),
                 NewFilePattern = options.NewFilePattern,
                 Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
-                StartInjection = new InjectionCommandCollection(new Queue<Queue<string>>(new []{ queue })),
+                CommandInjectionFactory = new CommandInjectionFactory(new InjectionParser()),
                 Tests = tests,
             };
+
             return command;
         }
 

@@ -4,5 +4,6 @@ namespace PurgeDemoCommands.Core
     {
         public long Index { get; set; }
         public long NumberOfBytes { get; set; }
+        public int Tick { get; set; }
     }
 }

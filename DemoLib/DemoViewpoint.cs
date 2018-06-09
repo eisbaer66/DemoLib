@@ -7,7 +7,7 @@ using TF2Net.Data;
 
 namespace DemoLib
 {
-	class DemoViewpoint
+    public class DemoViewpoint
 	{
 		[Flags]
 		public enum Flags

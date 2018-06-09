@@ -81,6 +81,9 @@
       <HintPath>..\packages\Serilog.Sinks.RollingFile.3.3.0\lib\net45\Serilog.Sinks.RollingFile.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Superpower, Version=1.0.0.0, Culture=neutral, PublicKeyToken=aec39280ded1b3a7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Superpower.2.0.0-dev-00116\lib\net45\Superpower.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -122,6 +125,10 @@
     <ProjectReference Include="..\PurgeDemoCommands.DemoLib\PurgeDemoCommands.DemoLib.csproj">
       <Project>{6D8FC0C5-3087-427C-8EEF-4B86D8AD5215}</Project>
       <Name>PurgeDemoCommands.DemoLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PurgeDemoCommands.Sprache\PurgeDemoCommands.Sprache.csproj">
+      <Project>{114838AC-B0A3-4188-ABB4-D321702A2C83}</Project>
+      <Name>PurgeDemoCommands.Sprache</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

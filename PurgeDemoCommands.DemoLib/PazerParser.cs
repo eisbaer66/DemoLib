@@ -18,14 +18,29 @@ namespace PurgeDemoCommands.DemoLib
 
         public async Task<IList<CommandPosition>> ReadDemo(string filename)
         {
+            int tick = 0;
             DemoReader demo = ParseDemo(filename);
             return demo.Commands
-                .OfType<DemoConsoleCommand>()
-                .Select(c => new CommandPosition
+                .Select(c =>
                 {
-                    Index = c.IndexStart + _commandTypeOffset,
-                    NumberOfBytes = c.IndexEnd - c.IndexStart - _commandTypeOffset,
+                    var paketCommand = c as DemoPacketCommand;
+                    if (paketCommand != null)
+                    {
+                        tick = paketCommand.Tick;
+                        return null;
+                    }
+                    var consoleCommand = c as DemoConsoleCommand;
+                    if (consoleCommand == null)
+                        return null;
+
+                    return new CommandPosition
+                    {
+                        Index = consoleCommand.IndexStart + _commandTypeOffset,
+                        NumberOfBytes = consoleCommand.IndexEnd - consoleCommand.IndexStart - _commandTypeOffset,
+                        Tick = tick,
+                    };
                 })
+                .Where(c => c != null)
                 .ToList();
         }
 

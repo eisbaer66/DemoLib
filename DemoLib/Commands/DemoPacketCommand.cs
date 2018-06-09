@@ -10,7 +10,7 @@ using TF2Net.NetMessages;
 namespace DemoLib.Commands
 {
 	[DebuggerDisplay("{Tick, nq} network packet [{Data.Length, nq}]")]
-	class DemoPacketCommand : TimestampedDemoCommand
+	public class DemoPacketCommand : TimestampedDemoCommand
 	{
 		public DemoViewpoint Viewpoint { get; set; }
 

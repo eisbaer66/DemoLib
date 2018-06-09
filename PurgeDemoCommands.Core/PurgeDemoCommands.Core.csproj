@@ -46,25 +46,39 @@
   <ItemGroup>
     <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="CommandHelper.cs" />
+    <Compile Include="CommandInjectionFactory.cs" />
     <Compile Include="CommandPosition.cs" />
     <Compile Include="ExecuteException.cs" />
     <Compile Include="Extensions\EnumerableExtension.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="IConfilctResolver.cs" />
     <Compile Include="IFilter.cs" />
-    <Compile Include="IInjectionCommandCollection.cs" />
-    <Compile Include="InjectionCommandCollection.cs" />
+    <Compile Include="ICommandInjection.cs" />
+    <Compile Include="CommandInjection.cs" />
+    <Compile Include="InjectionConfictException.cs" />
     <Compile Include="IParser.cs" />
     <Compile Include="IPurgeCommand.cs" />
     <Compile Include="ITest.cs" />
     <Compile Include="IThrottler.cs" />
+    <Compile Include="ITickIterator.cs" />
+    <Compile Include="NotEnoughCommandsToReplaceException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ThrottledFilesPurgeCommand.cs" />
     <Compile Include="PurgeCommand.cs" />
     <Compile Include="PurgeException.cs" />
+    <Compile Include="ReplacementPosition.cs" />
     <Compile Include="Result.cs" />
+    <Compile Include="TickInjection.cs" />
     <Compile Include="Warning.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PurgeDemoCommands.Sprache\PurgeDemoCommands.Sprache.csproj">
+      <Project>{114838AC-B0A3-4188-ABB4-D321702A2C83}</Project>
+      <Name>PurgeDemoCommands.Sprache</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
