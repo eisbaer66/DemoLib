@@ -29,6 +29,15 @@ namespace PurgeDemoCommands
         [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
         public bool ShowSummary { get; set; }
 
+        [Option('g', "skipGotoTick", DefaultValue = false, HelpText = "skips looking for a demo_gototick in the filename")]
+        public bool SkipSearchForImplicitGotoTick { get; set; }
+
+        [Option('t', "tickmarker", DefaultValue = "@", HelpText = "marker used to look for demo_gototick in the filename")]
+        public string TickMarkerInFilename { get; set; }
+
+        [Option('a', "pauseGotoTick", DefaultValue = false, HelpText = "pauses the demo after injecting demo_gototick from the filename")]
+        public bool PauseOnImplicitGotoTick { get; set; }
+
         [HelpOption(HelpText = "Display this help screen.")]
         public string GetUsage()
         {

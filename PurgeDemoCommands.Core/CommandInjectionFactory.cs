@@ -17,6 +17,8 @@ namespace PurgeDemoCommands.Core
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
 
         public string TickMarker { get; set; }
+        public bool SearchForOnImplicitGotoTick { get; set; }
+        public bool PauseOnImplicitGotoTick { get; set; }
         public IConfilctResolver ConflictResolver { get; set; }
         public IInjectionParser InjectionParser { get; set; }
 
@@ -24,6 +26,8 @@ namespace PurgeDemoCommands.Core
         {
             InjectionParser = injectionParser ?? throw new ArgumentNullException(nameof(injectionParser));
             TickMarker = "@";
+            SearchForOnImplicitGotoTick = true;
+            PauseOnImplicitGotoTick = true;
             ConflictResolver = new AbortingConfilctResolver();
         }
 
@@ -37,10 +41,13 @@ namespace PurgeDemoCommands.Core
                     return injectionFromFile;
             }
 
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
-            int index = fileNameWithoutExtension.IndexOf(TickMarker);
-            if (index >= 0)
-                return CreateInjectionFromTick(fileNameWithoutExtension, index);
+            if (SearchForOnImplicitGotoTick)
+            {
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+                int index = fileNameWithoutExtension.IndexOf(TickMarker);
+                if (index >= 0)
+                    return CreateInjectionFromTick(fileNameWithoutExtension, index);
+            }
 
             Log.TraceFormat("no injection found. using NullInjection");
             return new CommandInjection(new List<ITickInjection>());
@@ -82,8 +89,10 @@ namespace PurgeDemoCommands.Core
                 return new CommandInjection(new List<ITickInjection>());
             }
 
-            Log.InfoFormat("found {TickMarker} in {Filename}. injecting demo_gototick {Tick}", TickMarker, fileNameWithoutExtension, tick);
-            return new CommandInjection(new []{new TickInjection(0, new []{ "demo_gototick "+tick }, ConflictResolver, new ForwardTickIterator())});
+            string pause = PauseOnImplicitGotoTick ? "1" : "0";
+            string command = "demo_gototick " + tick + " 0 " + pause;
+            Log.InfoFormat("found {TickMarker} in {Filename}. injecting {Command}", TickMarker, fileNameWithoutExtension, command);
+            return new CommandInjection(new []{new TickInjection(0, new []{ command }, ConflictResolver, new ForwardTickIterator())});
         }
     }
 

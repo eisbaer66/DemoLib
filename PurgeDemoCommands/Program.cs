@@ -95,7 +95,12 @@ namespace PurgeDemoCommands
                 NewFilePattern = options.NewFilePattern,
                 Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
-                CommandInjectionFactory = new CommandInjectionFactory(new InjectionParser()),
+                CommandInjectionFactory = new CommandInjectionFactory(new InjectionParser())
+                {
+                    TickMarker = options.TickMarkerInFilename,
+                    SearchForOnImplicitGotoTick = !options.SkipSearchForImplicitGotoTick,
+                    PauseOnImplicitGotoTick = options.PauseOnImplicitGotoTick,
+                },
                 Tests = tests,
             };
 
