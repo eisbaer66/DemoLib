@@ -28,10 +28,22 @@ namespace DemoLib
 
 			List<DemoCommand> commands = new List<DemoCommand>();
 			Commands = commands;
+            
+		    long start = 0;
+		    long end = 0;
+            DemoCommand cmd = null;
+		    do
+		    {
+		        (cmd = ParseCommand(input))
 
-			DemoCommand cmd = null;
-			while ((cmd = ParseCommand(input)) != null)
-				commands.Add(cmd);
+                start = end;
+		        end = input.Position;
+		        cmd.IndexStart = start;
+		        cmd.IndexEnd = end;
+
+		        commands.Add(cmd);
+		    } while (cmd != null);
+
 		}
 
 		public static DemoReader FromStream(Stream input)
