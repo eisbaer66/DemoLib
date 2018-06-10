@@ -37,6 +37,7 @@ namespace PurgeDemoCommands.Specs
             if (Directory.Exists(testDataPath))
                 Directory.Delete(testDataPath, true);
             FileHelper.DirectoryCopy(Path.Combine(directoryName, "TestData_Init"), testDataPath, true);
+            FileHelper.DirectoryCopy("..\\..\\..\\PurgeDemoCommands\\bin\\Debug", directoryName, true, true);
         }
 
         [Given(@"the arguments \[(.*)]")]
@@ -82,8 +83,7 @@ namespace PurgeDemoCommands.Specs
 
     static class FileHelper
     {
-        public static void DirectoryCopy(
-            string sourceDirName, string destDirName, bool copySubDirs)
+        public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overrideExisting = false)
         {
             DirectoryInfo dir = new DirectoryInfo(sourceDirName);
             DirectoryInfo[] dirs = dir.GetDirectories();
@@ -112,7 +112,7 @@ namespace PurgeDemoCommands.Specs
                 string temppath = Path.Combine(destDirName, file.Name);
 
                 // Copy the file.
-                file.CopyTo(temppath, false);
+                file.CopyTo(temppath, overrideExisting);
             }
 
             // If copySubDirs is true, copy the subdirectories.
@@ -125,7 +125,7 @@ namespace PurgeDemoCommands.Specs
                     string temppath = Path.Combine(destDirName, subdir.Name);
 
                     // Copy the subdirectories.
-                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs, overrideExisting);
                 }
             }
         }
