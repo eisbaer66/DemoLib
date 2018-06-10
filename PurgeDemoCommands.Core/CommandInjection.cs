@@ -1,27 +1,67 @@
 using System.Collections.Generic;
 using System.Linq;
+using PurgeDemoCommands.Core.DemoEditActions;
 
 namespace PurgeDemoCommands.Core
 {
     public class CommandInjection : ICommandInjection
     {
         private IEnumerable<ITickInjection> _tickInjections;
+        private IBuffer _buffer;
 
         public CommandInjection(IEnumerable<ITickInjection> tickInjections)
         {
             _tickInjections = tickInjections;
+            _buffer = new Buffer();
         }
 
-        public IList<ReplacementPosition> PlanReplacements(IList<CommandPosition> positions)
+        public IEnumerable<IDemoEditAction> PlanReplacements(CommandPositions positions)
         {
-            IDictionary<int, List<ReplacementPosition>> dict = positions.GroupBy(p => p.Tick, p => ReplacementPosition.Nulls(p.Index, p.NumberOfBytes)).ToDictionary(g => g.Key, g => g.ToList());
+            Queue<ITickInjection> queue = new Queue<ITickInjection>(_tickInjections.OrderBy(i => i.Tick));
+            ITickInjection nextTickInjection = null;
+            if (queue.Count > 0)
+                nextTickInjection = queue.Dequeue();
 
-            foreach (ITickInjection tickInjection in _tickInjections)
+            bool isFirst = true;
+            foreach (CommandPosition position in positions.Positions)
             {
-                tickInjection.Into(dict);
+                if (isFirst)
+                {
+                    yield return new CopyDemoEditAction(_buffer)
+                    {
+                        Index = 0,
+                        Length = (int)position.Index + position.NumberOfBytes,
+                        Tick = position.Tick
+                    };
+                    isFirst = false;
+                    continue;
+                }
+
+                while (nextTickInjection != null && position.Tick > nextTickInjection.Tick && position.Index >= positions.MinimumIndex)
+                {
+                    yield return new InsertDemoEditAction()
+                    {
+                        Injection = nextTickInjection,
+                    };
+
+                    if (queue.Count > 0)
+                        nextTickInjection = queue.Dequeue();
+                    else
+                        nextTickInjection = null;
+                }
+
+                if (position.IsConsoleCommand)
+                    continue;
+
+                yield return new CopyDemoEditAction(_buffer)
+                {
+                    Index = position.Index,
+                    Length = position.NumberOfBytes,
+                    Tick = position.Tick
+                };
             }
 
-            return dict.Values.SelectMany(v => v).ToList();
+            yield return new CopyFileRemainderDemoEditAction(_buffer);
         }
     }
 }

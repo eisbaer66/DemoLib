@@ -5,6 +5,6 @@ namespace PurgeDemoCommands.Core
 {
     public interface IParser
     {
-        Task<IList<CommandPosition>> ReadDemo(string filename);
+        Task<CommandPositions> ReadDemo(string filename);
     }
 }

@@ -22,8 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.DemoLib",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.Core", "PurgeDemoCommands.Core\PurgeDemoCommands.Core.csproj", "{9B444650-558C-4F95-B254-65EBD13EB3C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.AhoCorasick", "PurgeDemoCommands.AhoCorasick\PurgeDemoCommands.AhoCorasick.csproj", "{8A61F6D2-983E-4D64-9D09-712A0353723E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.Specs", "PurgeDemoCommands.Specs\PurgeDemoCommands.Specs.csproj", "{542294E4-38C7-4861-9972-B7167C2E1DA1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F13BD71D-754D-4F10-9ED6-CA8B60D8D354}"
@@ -33,9 +31,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.CompareTests", "PurgeDemoCommands.CompareTests\PurgeDemoCommands.CompareTests.csproj", "{A373FD9B-AC80-49FC-9B60-EA4965C19062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.Sprache", "PurgeDemoCommands.Sprache\PurgeDemoCommands.Sprache.csproj", "{114838AC-B0A3-4188-ABB4-D321702A2C83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeDemoCommands.Sprache", "PurgeDemoCommands.Sprache\PurgeDemoCommands.Sprache.csproj", "{114838AC-B0A3-4188-ABB4-D321702A2C83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.Sprache.Tests", "PurgeDemoCommands.Sprache.Tests\PurgeDemoCommands.Sprache.Tests.csproj", "{A03D6378-75B6-452E-8568-81DE1BE4DAFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeDemoCommands.Sprache.Tests", "PurgeDemoCommands.Sprache.Tests\PurgeDemoCommands.Sprache.Tests.csproj", "{A03D6378-75B6-452E-8568-81DE1BE4DAFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,10 +65,6 @@ Global
 		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B444650-558C-4F95-B254-65EBD13EB3C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A61F6D2-983E-4D64-9D09-712A0353723E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU

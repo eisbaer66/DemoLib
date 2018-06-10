@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using PurgeDemoCommands.Core.DemoEditActions;
 
 namespace PurgeDemoCommands.Core
 {
     public interface ICommandInjection
     {
-        IList<ReplacementPosition> PlanReplacements(IList<CommandPosition> positions);
+        IEnumerable<IDemoEditAction> PlanReplacements(CommandPositions positions);
     }
 }

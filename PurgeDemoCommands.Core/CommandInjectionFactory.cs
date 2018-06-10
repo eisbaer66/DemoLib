@@ -19,7 +19,6 @@ namespace PurgeDemoCommands.Core
         public string TickMarker { get; set; }
         public bool SearchForOnImplicitGotoTick { get; set; }
         public bool PauseOnImplicitGotoTick { get; set; }
-        public IConfilctResolver ConflictResolver { get; set; }
         public IInjectionParser InjectionParser { get; set; }
 
         public CommandInjectionFactory(IInjectionParser injectionParser)
@@ -28,7 +27,6 @@ namespace PurgeDemoCommands.Core
             TickMarker = "@";
             SearchForOnImplicitGotoTick = true;
             PauseOnImplicitGotoTick = true;
-            ConflictResolver = new AbortingConfilctResolver();
         }
 
         public ICommandInjection CreateInjection(string filename)
@@ -68,7 +66,11 @@ namespace PurgeDemoCommands.Core
             var injs = items.Select(t =>
                 {
                     ITickIterator iterator = t.Dir == TickIterationDirection.Forward ? (ITickIterator) new ForwardTickIterator() : new BackwardTickIterator();
-                    return new TickInjection(t.Tick, t.Commands, ConflictResolver, iterator);
+                    return new TickInjection
+                    {
+                        Tick = t.Tick,
+                        Commands = string.Join("; ", t.Commands)
+                    };
                 })
                 .ToList();
 
@@ -92,7 +94,14 @@ namespace PurgeDemoCommands.Core
             string pause = PauseOnImplicitGotoTick ? "1" : "0";
             string command = "demo_gototick " + tick + " 0 " + pause;
             Log.InfoFormat("found {TickMarker} in {Filename}. injecting {Command}", TickMarker, fileNameWithoutExtension, command);
-            return new CommandInjection(new []{new TickInjection(0, new []{ command }, ConflictResolver, new ForwardTickIterator())});
+            return new CommandInjection(new[]
+            {
+                new TickInjection
+                {
+                    Tick = tick,
+                    Commands = command
+                }
+            });
         }
     }
 

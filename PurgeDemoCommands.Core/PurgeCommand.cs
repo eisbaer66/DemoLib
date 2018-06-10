@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PurgeDemoCommands.Core.DemoEditActions;
 using PurgeDemoCommands.Core.Logging;
 
 namespace PurgeDemoCommands.Core
@@ -31,9 +32,9 @@ namespace PurgeDemoCommands.Core
             {
                 Log.InfoFormat("purging {Filename}", FileName);
 
-                IList<CommandPosition> positions = await Parser.ReadDemo(FileName);
+                CommandPositions positions = await Parser.ReadDemo(FileName);
                 Log.InfoFormat("found {CommandPositionCount} commands in {Filename}", positions.Count, FileName);
-                IList<ReplacementPosition> replacments = PlanInjection(positions);
+                IList<IDemoEditAction> replacments = CommandInjection.PlanReplacements(positions).ToList(); ;
                 return await ReplaceCommandsWithTempFile(replacments);
             }
             catch (Exception e)
@@ -46,21 +47,7 @@ namespace PurgeDemoCommands.Core
             }
         }
 
-        private IList<ReplacementPosition> PlanInjection(IList<CommandPosition> positions)
-        {
-            try
-            {
-                return CommandInjection.PlanReplacements(positions);
-            }
-            catch (Exception e)
-            {
-                Log.ErrorException("error while planing injection. using NullInjection", e);
-
-                return new CommandInjection(new List<ITickInjection>()).PlanReplacements(positions);
-            }
-        }
-
-        private async Task<Result> ReplaceCommandsWithTempFile(IList<ReplacementPosition> positions)
+        private async Task<Result> ReplaceCommandsWithTempFile(IList<IDemoEditAction> positions)
         {
             Result result = new Result(FileName);
 
@@ -82,9 +69,7 @@ namespace PurgeDemoCommands.Core
             using (TempFileCollection tempFileCollection = new TempFileCollection())
             {
                 string tempFilename = tempFileCollection.AddExtension("dem");
-                File.Copy(FileName, tempFilename);
-
-
+                
                 await ReplaceMatches(tempFilename, positions);
                 foreach (ITest test in Tests)
                 {
@@ -105,29 +90,16 @@ namespace PurgeDemoCommands.Core
             return result;
         }
 
-        private async Task ReplaceMatches(string filename, IEnumerable<ReplacementPosition> positions)
+        private async Task ReplaceMatches(string filename, IEnumerable<IDemoEditAction> positions)
         {
-            using (var stream = File.Open(filename, FileMode.Open, FileAccess.ReadWrite))
+            using (var readStream = File.OpenRead(FileName))
+            using (var writeStream = File.OpenWrite(filename))
             {
-                foreach (ReplacementPosition position in positions)
+                foreach (IDemoEditAction position in positions)
                 {
-                    MoveToPosition(stream, position.Index);
-
-                    Log.TraceFormat("replacing {CommandPosition} with {InjectedCommand}", position.Index, Encoding.ASCII.GetString(position.Bytes));
-                    await Write(stream, position.Bytes);
+                    await position.Execute(readStream, writeStream);
                 }
             }
-        }
-
-        private static void MoveToPosition(FileStream stream, long index)
-        {
-            long bytesToMove = index - stream.Position;
-            stream.Seek(bytesToMove, SeekOrigin.Current);
-        }
-
-        private async Task Write(FileStream stream, byte[] bytes)
-        {
-            await stream.WriteAsync(bytes, 0, bytes.Length);
         }
     }
 }

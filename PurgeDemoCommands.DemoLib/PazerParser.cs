@@ -1,5 +1,3 @@
-using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,34 +12,69 @@ namespace PurgeDemoCommands.DemoLib
     public class PazerParser : IParser
     {
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
-        private static int _commandTypeOffset = 4;
 
-        public async Task<IList<CommandPosition>> ReadDemo(string filename)
+        public async Task<CommandPositions> ReadDemo(string filename)
         {
             int tick = 0;
+            long index = -1;
+            int length = 0;
+            bool readingConsoleCommand = false;
             DemoReader demo = ParseDemo(filename);
-            return demo.Commands
+
+            long minIndex = demo.Commands.FirstOrDefault(c => c.Type == DemoCommandType.dem_stringtables).IndexEnd;
+
+            List<CommandPosition> positions = demo.Commands
                 .Select(c =>
                 {
-                    var paketCommand = c as DemoPacketCommand;
-                    if (paketCommand != null)
-                    {
-                        tick = paketCommand.Tick;
-                        return null;
-                    }
-                    var consoleCommand = c as DemoConsoleCommand;
-                    if (consoleCommand == null)
+                    var paketCommand = c as TimestampedDemoCommand;
+                    if (paketCommand == null)
                         return null;
 
-                    return new CommandPosition
+                    int paketTick = paketCommand.Tick;
+                    if (paketTick == 0 && tick > 0)
+                        paketTick = tick;
+
+                    bool isConsoleCommand = paketCommand.Type == DemoCommandType.dem_consolecmd;
+                    bool changesType = isConsoleCommand ^ readingConsoleCommand; //XOR
+                    bool changesTick = paketTick != tick;
+
+                    if (!changesType && !changesTick)
                     {
-                        Index = consoleCommand.IndexStart + _commandTypeOffset,
-                        NumberOfBytes = consoleCommand.IndexEnd - consoleCommand.IndexStart - _commandTypeOffset,
-                        Tick = tick,
-                    };
+                        length += (int) (c.IndexEnd - c.IndexStart);
+                        return null;
+                    }
+
+                    var pos = CreatePos(readingConsoleCommand, index, length, tick);
+
+                    index = paketCommand.IndexStart;
+                    length = (int) (c.IndexEnd - c.IndexStart);
+                    tick = paketTick;
+                    readingConsoleCommand = isConsoleCommand;
+
+                    if (pos.Index < 0)
+                        return null;
+                    return pos;
                 })
                 .Where(c => c != null)
                 .ToList();
+
+            return new CommandPositions
+            {
+                MinimumIndex = minIndex,
+                Positions = positions,
+            };
+        }
+
+        private static CommandPosition CreatePos(bool isConsoleCommand, long index, int length, int tick)
+        {
+            var pos = new CommandPosition
+            {
+                Index = index,
+                NumberOfBytes = length,
+                Tick = tick,
+                IsConsoleCommand = isConsoleCommand,
+            };
+            return pos;
         }
 
         private static DemoReader ParseDemo(string filename)
