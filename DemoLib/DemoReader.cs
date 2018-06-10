@@ -29,18 +29,20 @@ namespace DemoLib
 			List<DemoCommand> commands = new List<DemoCommand>();
 			Commands = commands;
             
-            DemoCommand cmd = null;
-		    do
-		    {
+		    while (true)
+            {
 		        long start = input.Position;
 
-                cmd = ParseCommand(input);
+                DemoCommand cmd = ParseCommand(input);
+
+		        if (cmd == null)
+		            break;
 
 		        cmd.IndexStart = start;
 		        cmd.IndexEnd = input.Position;
 
 		        commands.Add(cmd);
-		    } while (cmd != null);
+		    }
 
 		}
 
