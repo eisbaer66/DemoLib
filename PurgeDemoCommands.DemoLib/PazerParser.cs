@@ -31,6 +31,10 @@ namespace PurgeDemoCommands.DemoLib
                         return null;
 
                     int paketTick = paketCommand.Tick;
+
+                    if (c.Type == DemoCommandType.dem_synctick)
+                        tick = paketTick;
+
                     if (paketTick == 0 && tick > 0)
                         paketTick = tick;
 

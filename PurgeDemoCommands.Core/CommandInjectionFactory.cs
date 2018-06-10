@@ -65,7 +65,6 @@ namespace PurgeDemoCommands.Core
 
             var injs = items.Select(t =>
                 {
-                    ITickIterator iterator = t.Dir == TickIterationDirection.Forward ? (ITickIterator) new ForwardTickIterator() : new BackwardTickIterator();
                     return new TickInjection
                     {
                         Tick = t.Tick,
