@@ -25,13 +25,19 @@ namespace PurgeDemoCommands.Sprache.Tests
         [TestMethod]
         public void TestCase()
         {
-            string text = "0 demo_gototick 350 0 1\r\n1000 demo_timescale 0.5";
+            string text = "0 demo_gototick 350 0 1\r\n1000 demo_timescale 0.5\r\n1200 demo_timescale 1\r\n1470 demo_timescale 0.5\r\n1530 demo_timescale 1\r\n2200 demo_timescale 0.5\r\n2400 demo_timescale 1\r\n3200 demo_timescale 0.5";
             Result<IEnumerable<TickConfigItem>> items = new InjectionParser().ParseFrom(text);
 
             IEnumerable<TickConfigItem> expectedItems = new []
             {
                 new TickConfigItem {Tick = 0, Commands ="demo_gototick 350 0 1"},
-                new TickConfigItem {Tick = 1000, Commands ="demo_timescale 0.5"}
+                new TickConfigItem {Tick = 1000, Commands ="demo_timescale 0.5"},
+                new TickConfigItem {Tick = 1200, Commands ="demo_timescale 1"},
+                new TickConfigItem {Tick = 1470, Commands ="demo_timescale 0.5"},
+                new TickConfigItem {Tick = 1530, Commands ="demo_timescale 1"},
+                new TickConfigItem {Tick = 2200, Commands ="demo_timescale 0.5"},
+                new TickConfigItem {Tick = 2400, Commands ="demo_timescale 1"},
+                new TickConfigItem {Tick = 3200, Commands ="demo_timescale 0.5"},
             };
             Assert.That.ItemsAreEqual(expectedItems, items);
         }
