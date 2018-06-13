@@ -71,11 +71,11 @@ namespace PurgeDemoCommands.Specs
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("purge single demo")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "PurgePazer")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("mytag")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("ConsoleTest")]
         public virtual void PurgeSingleDemo()
         {
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge single demo", new string[] {
-                        "mytag"});
+                        "ConsoleTest"});
 #line 7
 this.ScenarioSetup(scenarioInfo);
 #line 8
@@ -96,24 +96,26 @@ this.ScenarioSetup(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("purge multiple demos")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "PurgePazer")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("ConsoleTest")]
         public virtual void PurgeMultipleDemos()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge multiple demos", ((string[])(null)));
-#line 14
-this.ScenarioSetup(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge multiple demos", new string[] {
+                        "ConsoleTest"});
 #line 15
+this.ScenarioSetup(scenarioInfo);
+#line 16
  testRunner.Given("the arguments [TestData\\_\\0-Me-Intro.dem TestData\\_\\19-Me-Using-Other-Spies-As-De" +
                     "coy.dem]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 16
- testRunner.And("the timeout 4000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line 17
+ testRunner.And("the timeout 4000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 18
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                         "TestData\\_\\purged\\0-Me-Intro.dem"});
             table2.AddRow(new string[] {
                         "TestData\\_\\purged\\19-Me-Using-Other-Spies-As-Decoy.dem"});
-#line 18
+#line 19
  testRunner.Then("I expect files", ((string)(null)), table2, "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -122,23 +124,25 @@ this.ScenarioSetup(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("purge folder \'_\'")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "PurgePazer")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("ConsoleTest")]
         public virtual void PurgeFolder_()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge folder \'_\'", ((string[])(null)));
-#line 22
-this.ScenarioSetup(scenarioInfo);
-#line 23
- testRunner.Given("the arguments [TestData\\_]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge folder \'_\'", new string[] {
+                        "ConsoleTest"});
 #line 24
- testRunner.And("the timeout 2000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+this.ScenarioSetup(scenarioInfo);
 #line 25
+ testRunner.Given("the arguments [TestData\\_]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 26
+ testRunner.And("the timeout 2000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 27
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
                         "TestData\\_\\purged\\0-Me-Intro.dem"});
             table3.AddRow(new string[] {
                         "TestData\\_\\purged\\19-Me-Using-Other-Spies-As-Decoy.dem"});
-#line 26
+#line 28
  testRunner.Then("I expect files", ((string)(null)), table3, "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -147,16 +151,18 @@ this.ScenarioSetup(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("purge folder \'1\'")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "PurgePazer")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("ConsoleTest")]
         public virtual void PurgeFolder1()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge folder \'1\'", ((string[])(null)));
-#line 30
-this.ScenarioSetup(scenarioInfo);
-#line 31
- testRunner.Given("the arguments [TestData\\1]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 32
- testRunner.And("the timeout 30000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge folder \'1\'", new string[] {
+                        "ConsoleTest"});
 #line 33
+this.ScenarioSetup(scenarioInfo);
+#line 34
+ testRunner.Given("the arguments [TestData\\1]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 35
+ testRunner.And("the timeout 30000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 36
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
@@ -199,7 +205,7 @@ this.ScenarioSetup(scenarioInfo);
                         "TestData\\1\\purged\\18-Me-The-Bullets-Curve.dem"});
             table4.AddRow(new string[] {
                         "TestData\\1\\purged\\19-Me-Using-Other-Spies-As-Decoy.dem"});
-#line 34
+#line 37
  testRunner.Then("I expect files", ((string)(null)), table4, "Then ");
 #line hidden
             this.ScenarioCleanup();
@@ -208,16 +214,18 @@ this.ScenarioSetup(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("purge folder \'2\'")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "PurgePazer")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("ConsoleTest")]
         public virtual void PurgeFolder2()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge folder \'2\'", ((string[])(null)));
-#line 56
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("purge folder \'2\'", new string[] {
+                        "ConsoleTest"});
+#line 60
 this.ScenarioSetup(scenarioInfo);
-#line 57
+#line 61
  testRunner.Given("the arguments [TestData\\2]", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line 58
+#line 62
  testRunner.And("the timeout 14000", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line 59
+#line 63
  testRunner.When("I run PurgeDemoComands", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
@@ -232,7 +240,7 @@ this.ScenarioSetup(scenarioInfo);
                         "TestData\\2\\purged\\mannofsteel.dem"});
             table5.AddRow(new string[] {
                         "TestData\\2\\purged\\powergunner.dem"});
-#line 60
+#line 64
  testRunner.Then("I expect files", ((string)(null)), table5, "Then ");
 #line hidden
             this.ScenarioCleanup();

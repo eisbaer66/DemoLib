@@ -29,8 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		test.runsettings = test.runsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeDemoCommands.CompareTests", "PurgeDemoCommands.CompareTests\PurgeDemoCommands.CompareTests.csproj", "{A373FD9B-AC80-49FC-9B60-EA4965C19062}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeDemoCommands.Sprache", "PurgeDemoCommands.Sprache\PurgeDemoCommands.Sprache.csproj", "{114838AC-B0A3-4188-ABB4-D321702A2C83}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PurgeDemoCommands.Sprache.Tests", "PurgeDemoCommands.Sprache.Tests\PurgeDemoCommands.Sprache.Tests.csproj", "{A03D6378-75B6-452E-8568-81DE1BE4DAFC}"
@@ -75,10 +73,6 @@ Global
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{542294E4-38C7-4861-9972-B7167C2E1DA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A373FD9B-AC80-49FC-9B60-EA4965C19062}.Release|Any CPU.Build.0 = Release|Any CPU
 		{114838AC-B0A3-4188-ABB4-D321702A2C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{114838AC-B0A3-4188-ABB4-D321702A2C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{114838AC-B0A3-4188-ABB4-D321702A2C83}.Release|Any CPU.ActiveCfg = Release|Any CPU

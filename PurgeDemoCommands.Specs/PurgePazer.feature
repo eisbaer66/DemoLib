@@ -3,14 +3,15 @@
 	As a TF2 player
 	I want to remove consolecomands from demo-files
 
-@mytag
+@ConsoleTest
 Scenario: purge single demo
 	Given the arguments [TestData\_\0-Me-Intro.dem]
 	And the timeout 2000
 	When I run PurgeDemoComands
 	Then I expect files
 	 | TestData\_\purged\0-Me-Intro.dem |
-
+	 
+@ConsoleTest
 Scenario: purge multiple demos
 	Given the arguments [TestData\_\0-Me-Intro.dem TestData\_\19-Me-Using-Other-Spies-As-Decoy.dem]
 	And the timeout 4000
@@ -18,7 +19,8 @@ Scenario: purge multiple demos
 	Then I expect files
 	 | TestData\_\purged\0-Me-Intro.dem |
 	 | TestData\_\purged\19-Me-Using-Other-Spies-As-Decoy.dem |
-
+	 
+@ConsoleTest
 Scenario: purge folder '_'
 	Given the arguments [TestData\_]
 	And the timeout 2000
@@ -26,7 +28,8 @@ Scenario: purge folder '_'
 	Then I expect files
 	 | TestData\_\purged\0-Me-Intro.dem |
 	 | TestData\_\purged\19-Me-Using-Other-Spies-As-Decoy.dem |
-
+	 
+@ConsoleTest
 Scenario: purge folder '1'
 	Given the arguments [TestData\1]
 	And the timeout 30000
@@ -52,7 +55,8 @@ Scenario: purge folder '1'
 	 | TestData\1\purged\17-Me-Being-Clever-With-Teleporters.dem |
 	 | TestData\1\purged\18-Me-The-Bullets-Curve.dem |
 	 | TestData\1\purged\19-Me-Using-Other-Spies-As-Decoy.dem |
-
+	 
+@ConsoleTest
 Scenario: purge folder '2'
 	Given the arguments [TestData\2]
 	And the timeout 14000
