@@ -5,7 +5,7 @@ using System.Linq;
 using PurgeDemoCommands.Core.Logging;
 using PurgeDemoCommands.Sprache;
 
-namespace PurgeDemoCommands.Core
+namespace PurgeDemoCommands.Core.CommandInjections
 {
     public interface ICommandInjectionFactory
     {
@@ -101,20 +101,6 @@ namespace PurgeDemoCommands.Core
                     Commands = command
                 }
             });
-        }
-    }
-
-    internal class CommandInjectionInitializiationException : Exception
-    {
-        public CommandInjectionInitializiationException()
-        {
-            
-        }
-
-        public CommandInjectionInitializiationException(string msg)
-        :base(msg)
-        {
-            
         }
     }
 }

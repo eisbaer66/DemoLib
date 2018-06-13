@@ -5,6 +5,7 @@ using System.Linq;
 using CommandLine;
 using Nito.AsyncEx;
 using PurgeDemoCommands.Core;
+using PurgeDemoCommands.Core.CommandInjections;
 using PurgeDemoCommands.DemoLib;
 using PurgeDemoCommands.Sprache;
 using Serilog;

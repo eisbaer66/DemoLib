@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using PurgeDemoCommands.Core.DemoEditActions;
 
-namespace PurgeDemoCommands.Core
+namespace PurgeDemoCommands.Core.CommandInjections
 {
     public interface ICommandInjection
     {

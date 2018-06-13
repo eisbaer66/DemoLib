@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PurgeDemoCommands.Core.DemoEditActions;
 
-namespace PurgeDemoCommands.Core
+namespace PurgeDemoCommands.Core.CommandInjections
 {
     public class CommandInjection : ICommandInjection
     {

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PurgeDemoCommands.Core.CommandInjections;
 using PurgeDemoCommands.Core.DemoEditActions;
 using PurgeDemoCommands.Core.Logging;
 

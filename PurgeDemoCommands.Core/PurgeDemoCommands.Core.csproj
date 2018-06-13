@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="CommandHelper.cs" />
-    <Compile Include="CommandInjectionFactory.cs" />
+    <Compile Include="CommandInjections\CommandInjectionFactory.cs" />
     <Compile Include="CommandPosition.cs" />
     <Compile Include="DemoEditActions\CopyDemoEditAction.cs" />
     <Compile Include="DemoEditActions\CopyFileRemainderDemoEditAction.cs" />
@@ -57,18 +57,15 @@
     <Compile Include="IBuffer.cs" />
     <Compile Include="DemoEditActions\IDemoEditAction.cs" />
     <Compile Include="IFilter.cs" />
-    <Compile Include="ICommandInjection.cs" />
-    <Compile Include="CommandInjection.cs" />
+    <Compile Include="CommandInjections\ICommandInjection.cs" />
+    <Compile Include="CommandInjections\CommandInjection.cs" />
     <Compile Include="IParser.cs" />
     <Compile Include="IPurgeCommand.cs" />
     <Compile Include="ITest.cs" />
     <Compile Include="IThrottler.cs" />
-    <Compile Include="ITickIterator.cs" />
-    <Compile Include="NotEnoughCommandsToReplaceException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThrottledFilesPurgeCommand.cs" />
     <Compile Include="PurgeCommand.cs" />
-    <Compile Include="PurgeException.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="TickInjection.cs" />
     <Compile Include="Warning.cs" />
