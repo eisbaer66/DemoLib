@@ -166,7 +166,7 @@ namespace PurgeDemoCommands
 
                 Console.Out.WriteLine("Option 1:");
                 Console.Out.WriteLine("if you simply want to skip to a certain tick at the beginning of the demo,");
-                Console.Out.WriteLine("rename you demo so it ends in '@tick' (e.i. awesome@200.dem will skip to tick 200).");
+                Console.Out.WriteLine("rename your demo so it ends in '@tick' (e.i. awesome@200.dem will skip to tick 200).");
                 Console.Out.WriteLine("using option --skipGotoTick skips this");
                 Console.Out.WriteLine("using option --tickmarker defines which text will be searched in the filename (Default: '@')");
                 Console.Out.WriteLine("using option --pauseGotoTick skips to the detected tick and pauses the demo (instead of starting immediately)");
