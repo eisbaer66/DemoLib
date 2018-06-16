@@ -36,6 +36,7 @@ using option --pauseGotoTick skips to the detected tick and pauses the demo (ins
 ### Option 2 ###
 If you want to insert advanced commands at specific ticks, create a textfile next to the demo-file with the same name appending '.inj' (awesome.dem.inj).
 This file should contain the ticks and commands that should be injected
+
 The following example will
 1. go to tick 200
 2. pause the demo and slow down the playback to half speed at tick 500
