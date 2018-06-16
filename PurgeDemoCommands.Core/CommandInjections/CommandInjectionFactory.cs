@@ -97,7 +97,7 @@ namespace PurgeDemoCommands.Core.CommandInjections
             {
                 new TickInjection
                 {
-                    Tick = tick,
+                    Tick = 0,
                     Commands = command
                 }
             });
