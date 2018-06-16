@@ -11,32 +11,32 @@ namespace PurgeDemoCommands
         [ValueList(typeof(List<string>))]
         public IList<string> Files { get; set; }
 
-        [Option('n', "name", DefaultValue = "purged\\{0}.dem", HelpText = "name pattern of generated file")]
+        [Option('n', "name", DefaultValue = "purged\\{0}.dem", HelpText = "Defines the name pattern of the generated file ({0} will be replaced by the original filename).")]
         public string NewFilePattern { get; set; }
 
-        [Option('w', "whitelist", HelpText = "path to file containing whitelist for DemoCommands", MutuallyExclusiveSet = "filter")]
-        public string WhitelistPath { get; set; }
+        [Option('f', "force", DefaultValue = false, HelpText = "Closes the program after finishing (instead of waiting for a 'enter')")]
+        public bool Force { get; set; }
 
-        [Option('b', "blacklist", HelpText = "path to file containing blacklist for DemoCommands", MutuallyExclusiveSet = "filter")]
-        public string BlacklistPath { get; set; }
-
-        [Option('s', "skipTest", DefaultValue = false, HelpText = "skips test if purged file can be parsed again")]
+        [Option('s', "skipTest", DefaultValue = false, HelpText = "Skips test if purged file can be parsed again.")]
         public bool SkipTest { get; set; }
 
-        [Option('o', "overwrite", DefaultValue = false, HelpText = "overwrites existing (purged) files")]
+        [Option('o', "overwrite", DefaultValue = false, HelpText = "Overwrites existing (purged) files.")]
         public bool Overwrite { get; set; }
 
-        [Option('p', "successfullPurges", DefaultValue = false, HelpText = "shows a summary after purgeing")]
+        [Option('p', "successfullPurges", DefaultValue = false, HelpText = "Shows a summary after purgeing.")]
         public bool ShowSummary { get; set; }
 
-        [Option('g', "skipGotoTick", DefaultValue = false, HelpText = "skips looking for a demo_gototick in the filename")]
+        [Option('g', "skipGotoTick", DefaultValue = false, HelpText = "Skips looking for a demo_gototick in the filename.")]
         public bool SkipSearchForImplicitGotoTick { get; set; }
 
-        [Option('t', "tickmarker", DefaultValue = "@", HelpText = "marker used to look for demo_gototick in the filename")]
+        [Option('t', "tickmarker", DefaultValue = "@", HelpText = "Defines marker in the filename (used to look for demo_gototick ).")]
         public string TickMarkerInFilename { get; set; }
 
-        [Option('a', "pauseGotoTick", DefaultValue = false, HelpText = "pauses the demo after injecting demo_gototick from the filename")]
+        [Option('a', "pauseGotoTick", DefaultValue = false, HelpText = "Pauses the demo after injecting demo_gototick from the filename.")]
         public bool PauseOnImplicitGotoTick { get; set; }
+
+        [Option("helpinjection", DefaultValue = false, HelpText = "Display help screen for injections.")]
+        public bool HelpInjection { get; set; }
 
         [HelpOption(HelpText = "Display this help screen.")]
         public string GetUsage()
@@ -53,7 +53,10 @@ namespace PurgeDemoCommands
             help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path to demos\\awesome.dem\"");
             help.AddPreOptionsLine("       PurgeDemoCommands.exe \"C:\\path to demos\"");
             help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -n {0}_clean.dem");
-            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -o -s -u");
+            help.AddPreOptionsLine("       PurgeDemoCommands.exe awesome.dem -o -s -f");
+            help.AddPreOptionsLine(string.Empty);
+            help.AddPreOptionsLine("For additional info on injecting console commands type");
+            help.AddPreOptionsLine("    PurgeDemoCommands.exe --helpinjection");
             help.AddPreOptionsLine(string.Empty);
             help.AddPreOptionsLine("Options:");
             help.AddOptions(this);

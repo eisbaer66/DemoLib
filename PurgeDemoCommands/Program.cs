@@ -43,6 +43,12 @@ namespace PurgeDemoCommands
             IThrottledPurgeCommand command = SetupCommand(options);
             IEnumerable<Result> results = await command.Execute();
             LogResults(results.ToArray(), options);
+
+            if (!options.Force)
+            {
+                await Console.Out.WriteLineAsync("press 'enter' to exit");
+                await Console.In.ReadLineAsync();
+            }
         }
 
         private static void LogResults(ICollection<Result> results, Options options)
@@ -84,9 +90,6 @@ namespace PurgeDemoCommands
 
         private static IThrottledPurgeCommand SetupCommand(Options options)
         {
-            string[] whitelist = GetCommandsFromFile(options.WhitelistPath);
-            string[] blacklist = GetCommandsFromFile(options.BlacklistPath);
-
             IList<ITest> tests = GetTests(options.SkipTest);
 
             ThrottledFilesPurgeCommand command = new ThrottledFilesPurgeCommand(new CommandHelper())
@@ -94,7 +97,6 @@ namespace PurgeDemoCommands
                 Parser = new PazerParser(),
                 Filenames = GetFiles(options),
                 NewFilePattern = options.NewFilePattern,
-                Filter = Filter.From(whitelist, blacklist),
                 Overwrite = options.Overwrite,
                 CommandInjectionFactory = new CommandInjectionFactory(new InjectionParser())
                 {
@@ -156,6 +158,30 @@ namespace PurgeDemoCommands
                 _logger.Fatal("could not parse parameters");
                 Console.Error.WriteLine(options.GetUsage());
                 Environment.Exit(1);
+            }
+
+            if (options.HelpInjection)
+            {
+                _logger.Debug("showing injection help");
+
+                Console.Out.WriteLine("Option 1:");
+                Console.Out.WriteLine("if you simply want to skip to a certain tick at the beginning of the demo,");
+                Console.Out.WriteLine("rename you demo so it ends in '@tick' (e.i. awesome@200.dem will skip to tick 200).");
+                Console.Out.WriteLine("using option --skipGotoTick skips this");
+                Console.Out.WriteLine("using option --tickmarker defines which text will be searched in the filename (Default: '@')");
+                Console.Out.WriteLine("using option --pauseGotoTick skips to the detected tick and pauses the demo (instead of starting immediately)");
+                Console.Out.WriteLine("Option 2:");
+                Console.Out.WriteLine("if you want to insert advanced commands at specific ticks,");
+                Console.Out.WriteLine("create a textfile next to the demo-file with the same name appending '.inj' (awesome.dem.inj).");
+                Console.Out.WriteLine("this file should contain the ticks and commands that should be injected");
+                Console.Out.WriteLine("the following example will ");
+                Console.Out.WriteLine("1. go to tick 200");
+                Console.Out.WriteLine("2. pause the demo and slow down the playback to half speed at tick 500");
+                Console.Out.WriteLine("awesome.dem.inj:");
+                Console.Out.WriteLine("0 demo_gototick 200");
+                Console.Out.WriteLine("500 demo_pause; demo_timescale 0.5");
+                
+                return null;
             }
 
             if (options.Files.Count == 0)

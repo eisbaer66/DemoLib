@@ -56,7 +56,6 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="IBuffer.cs" />
     <Compile Include="DemoEditActions\IDemoEditAction.cs" />
-    <Compile Include="IFilter.cs" />
     <Compile Include="CommandInjections\ICommandInjection.cs" />
     <Compile Include="CommandInjections\CommandInjection.cs" />
     <Compile Include="IParser.cs" />

@@ -22,7 +22,6 @@ namespace PurgeDemoCommands.Core
         public IList<string> Filenames { get; set; }
         public string NewFilePattern { get; set; }
         public bool Overwrite { get; set; }
-        public IFilter Filter { get; set; }
         public IParser Parser { get; set; }
         public ICommandInjectionFactory CommandInjectionFactory { get; set; }
         public IEnumerable<ITest> Tests { get; set; }
