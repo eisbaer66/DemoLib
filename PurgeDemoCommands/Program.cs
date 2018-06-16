@@ -170,6 +170,7 @@ namespace PurgeDemoCommands
                 Console.Out.WriteLine("using option --skipGotoTick skips this");
                 Console.Out.WriteLine("using option --tickmarker defines which text will be searched in the filename (Default: '@')");
                 Console.Out.WriteLine("using option --pauseGotoTick skips to the detected tick and pauses the demo (instead of starting immediately)");
+                Console.Out.WriteLine(string.Empty);
                 Console.Out.WriteLine("Option 2:");
                 Console.Out.WriteLine("if you want to insert advanced commands at specific ticks,");
                 Console.Out.WriteLine("create a textfile next to the demo-file with the same name appending '.inj' (awesome.dem.inj).");
@@ -177,7 +178,7 @@ namespace PurgeDemoCommands
                 Console.Out.WriteLine("the following example will ");
                 Console.Out.WriteLine("1. go to tick 200");
                 Console.Out.WriteLine("2. pause the demo and slow down the playback to half speed at tick 500");
-                Console.Out.WriteLine("awesome.dem.inj:");
+                Console.Out.WriteLine("content of awesome.dem.inj:");
                 Console.Out.WriteLine("0 demo_gototick 200");
                 Console.Out.WriteLine("500 demo_pause; demo_timescale 0.5");
                 
